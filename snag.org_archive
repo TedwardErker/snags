@@ -1,0 +1,163 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/erker/projects/snag/snag.org
+
+
+* extract values at training polygons
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-06-07 Thu 13:37
+  :ARCHIVE_FILE: ~/projects/snag/snag.org
+  :ARCHIVE_CATEGORY: snag
+  :END:
+
+#+begin_src R
+train.stack.int <- stack(list.files("data/image/train/int", full.names = T, pattern = ".*.tif$"))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+
+  mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename="data/image/train/trainstack.ffdata")
+
+  for(i in 1:nlayers(train.stack.int)){
+      mat[,i] <- train.stack.int[[i]][]
+  }
+
+  save(mat,file="data/image/train/train_stack_mat.RData")
+
+  ID_Raster <- raster(train.stack.int[[1]])
+  ID_Raster[] <- 1:ncell(train.stack.int[[1]])
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+  ext_ID <- extract(ID_Raster, s, df = T)
+  s@data$ID <- 1:length(s)
+  ext_ID <- left_join(ext_ID, s@data)
+
+  extracted.values <- mat[as.numeric(ext_ID$layer),]
+
+  df <- data.frame(extracted.values)
+  colnames(df) <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
+
+  df$Class <- factor(ext_ID$Class)
+#+end_src
+
+#+RESULTS:
+: Joining, by = "ID"
+
+#+begin_src R
+saveRDS(df, "data/training/model_building_df.rds")
+#+end_src
+
+#+RESULTS:
+
+
+Archived entries from file /home/erker/projects/snag/snag.org
+
+
+* old extract
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-06-07 Thu 13:37
+  :ARCHIVE_FILE: ~/projects/snag/snag.org
+  :ARCHIVE_OLPATH: extract values at training areas
+  :ARCHIVE_CATEGORY: snag
+  :END:
+
+This is slow and inefficient
+
+#+begin_src R
+  train.stack.int <- stack(list.files("data/image/train/int", full.names = T, pattern = ".*.tif$"))
+
+  snag.df <- extract(train.stack.int, which(getValues(snag == 255)), df = T)
+  snag.df$Class <- "snag"
+
+  liveveg.cells <- sample(which(getValues(liveveg == 255)),200)
+  liveveg.df <- extract(train.stack.int, liveveg.cells, df = T)
+  liveveg.df$Class <- "liveveg"
+
+  livetree.cells <- sample(which(getValues(livetree == 255)),600)
+  livetree.df <- extract(train.stack.int, livetree.cells, df = T)
+  livetree.df$Class <- "livetree"
+
+  other.cells <- sample(which(getValues(other == 255)),600)
+  other.df <- extract(train.stack.int, other.cells, df = T)
+  other.df$Class <- "other"
+
+#+end_src
+
+#+begin_src R
+df <- do.call("bind", list(snag.df, liveveg.df, livetree.df, other.df))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+df <- select(df, -ID)
+saveRDS(df, "data/training/model_building_df.rds")
+#+end_src
+
+#+RESULTS:
+
+
+
+
+
+
+
+Archived entries from file /home/erker/projects/snag/snag.org
+
+
+* old extract
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-06-07 Thu 13:38
+  :ARCHIVE_FILE: ~/projects/snag/snag.org
+  :ARCHIVE_OLPATH: extract values at training areas
+  :ARCHIVE_CATEGORY: snag
+  :END:
+
+This is slow and inefficient
+
+#+begin_src R
+  train.stack.int <- stack(list.files("data/image/train/int", full.names = T, pattern = ".*.tif$"))
+
+  snag.df <- extract(train.stack.int, which(getValues(snag == 255)), df = T)
+  snag.df$Class <- "snag"
+
+  liveveg.cells <- sample(which(getValues(liveveg == 255)),200)
+  liveveg.df <- extract(train.stack.int, liveveg.cells, df = T)
+  liveveg.df$Class <- "liveveg"
+
+  livetree.cells <- sample(which(getValues(livetree == 255)),600)
+  livetree.df <- extract(train.stack.int, livetree.cells, df = T)
+  livetree.df$Class <- "livetree"
+
+  other.cells <- sample(which(getValues(other == 255)),600)
+  other.df <- extract(train.stack.int, other.cells, df = T)
+  other.df$Class <- "other"
+
+#+end_src
+
+#+begin_src R
+df <- do.call("bind", list(snag.df, liveveg.df, livetree.df, other.df))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+df <- select(df, -ID)
+saveRDS(df, "data/training/model_building_df.rds")
+#+end_src
+
+#+RESULTS:
+
+
+
+
+
+
+
+
