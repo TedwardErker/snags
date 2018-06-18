@@ -1180,12 +1180,14 @@ stretch.vals <- read.csv(stretch.vals, "data/training/stretchvals.csv")
 test.stack.int <- stack(list.files("data/image/test/int", full.names = T, pattern = ".*.tif$"))
 #+end_src
 
+#+RESULTS:
+
 ** predict on test raster
 
 #+RESULTS:
 
 #+begin_src R
-pred.test <- predict(test.stack, mod)
+pred.test <- predict(test.stack.int, mod)
 #+end_src
 
 #+RESULTS:
