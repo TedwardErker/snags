@@ -986,7 +986,7 @@ liveveg <- raster("data/training/liveveg.png")
 
 #+RESULTS:
 
-#+begin_src R
+#+begin_src R :eval no
 
   mat <- ff(vmode="integer",dim=c(ncell(train.stack.int),nlayers(train.stack.int)),filename="data/image/train/trainstack.ffdata")
 
