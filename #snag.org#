@@ -1152,19 +1152,42 @@ writeRaster(r.test, "data/image/test/test.tif")
 #+begin_src R
 
 #+end_src
-** predict on test raster
+
+** convert to integer
+*** stretch
 #+begin_src R
-test.stack <- stack(list.files("data/image/test_.*.tif$", full.names = T))
+test.stack <- stack(list.files("data/image/test", full.names = T, pattern = "test_.*.tif$"))
 names(test.stack) <- str_match(names(test.stack), "test(.*)")[,2]
 #+end_src
 
 #+RESULTS:
-: Error in x[[1]] : subscript out of bounds
-: Error in stri_match_first_regex(string, pattern, opts_regex = opts(pattern)) : 
-:   object 'test.stack' not found
 
 #+begin_src R
-pred.test <- predict(test.stack, mod)
+stretch.vals <- read.csv(stretch.vals, "data/training/stretchvals.csv")
+
+  test.stack.int <- lapply(1:nlayers(test.stack), function(i) {
+      mn <- stretch.vals[i,1]
+      mx <- stretch.vals[i,2]
+      calc(test.stack[[i]], fun=function(x){((x - mn) * 254)/(mx- mn) + 0},
+           filename = paste0("data/image/test/int/",names(test.stack[[i]]),".tif"), datatype='INT1U', overwrite = T)
+  })
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+test.stack.int <- stack(list.files("data/image/test/int", full.names = T, pattern = ".*.tif$"))
+#+end_src
+
+#+RESULTS:
+
+** predict on test raster
+
+#+RESULTS:
+
+#+begin_src R
+pred.test <- predict(test.stack.int, mod)
 #+end_src
 
 #+RESULTS:
