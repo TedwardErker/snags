@@ -972,13 +972,13 @@ liveveg <- raster("data/training/liveveg.png")
     snag.cells <- which(getValues(snag == 255))
     snag.df <- data.frame(cell = snag.cells, Class = "snag")
 
-    liveveg.cells <- sample(which(getValues(liveveg == 255)),1000)
+    liveveg.cells <- sample(which(getValues(liveveg == 255)),4000)
     liveveg.df <- data.frame(cell = liveveg.cells, Class = "liveveg")
 
-    livetree.cells <- sample(which(getValues(livetree == 255)),1000)
+    livetree.cells <- sample(which(getValues(livetree == 255)),4000)
     livetree.df <- data.frame(cell = livetree.cells, Class = "livetree")
 
-    other.cells <- sample(which(getValues(other == 255)),1000)
+    other.cells <- sample(which(getValues(other == 255)),4000)
     other.df <- data.frame(cell = other.cells, Class = "other")
 
   ext_ID <- do.call("bind", list(snag.df, liveveg.df, livetree.df, other.df))
