@@ -921,7 +921,8 @@ train.stack <- stack(list.files("data/image/train", full.names = T, pattern = ".
 #+BEGIN_SRC R
 mns <- minValue(train.stack)
 mxs <- maxValue(train.stack)
-stretch.vals <- cbind(mns,mxs)
+nms <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
+stretch.vals <- cbind(mns,mxs,nms)
 write.csv(stretch.vals, "data/training/stretchvals.csv")
 #+END_SRC
 
@@ -1160,11 +1161,14 @@ names(test.stack) <- str_match(names(test.stack), "test(.*)")[,2]
 #+RESULTS:
 
 #+begin_src R
+dir.create("data/image/test/int/")
 stretch.vals <- read.csv("data/training/stretchvals.csv")
 
   test.stack.int <- lapply(1:nlayers(test.stack), function(i) {
-      mn <- stretch.vals[i,1]
-      mx <- stretch.vals[i,2]
+      nm <- names(test.stack[[i]])
+      j <- which(stretch.vals[,"nms"] == nm)
+      mn <- stretch.vals[j,1]
+      mx <- stretch.vals[j,2]
       calc(test.stack[[i]], fun=function(x){((x - mn) * 254)/(mx- mn) + 0},
            filename = paste0("data/image/test/int/",names(test.stack[[i]]),".tif"), datatype='INT1U', overwrite = T)
   })
