@@ -923,7 +923,7 @@ mns <- minValue(train.stack)
 mxs <- maxValue(train.stack)
 nms <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
 stretch.vals <- cbind(mns,mxs,nms)
-write.csv(stretch.vals, "data/training/stretchvals.csv")
+write.csv(stretch.vals, "data/training/stretchvals.csv", row.names = F)
 #+END_SRC
 
 #+RESULTS:
@@ -1161,21 +1161,32 @@ names(test.stack) <- str_match(names(test.stack), "test(.*)")[,2]
 #+RESULTS:
 
 #+begin_src R
-dir.create("data/image/test/int/")
-stretch.vals <- read.csv("data/training/stretchvals.csv")
+      dir.create("data/image/test/int/")
+      stretch.vals <- read.csv("data/training/stretchvals.csv")
 
-  test.stack.int <- lapply(1:nlayers(test.stack), function(i) {
-      nm <- names(test.stack[[i]])
-      j <- which(stretch.vals[,"nms"] == nm)
-      mn <- stretch.vals[j,1]
-      mx <- stretch.vals[j,2]
-      calc(test.stack[[i]], fun=function(x){((x - mn) * 254)/(mx- mn) + 0},
-           filename = paste0("data/image/test/int/",names(test.stack[[i]]),".tif"), datatype='INT1U', overwrite = T)
-  })
+        test.stack.int <- lapply(1:nlayers(test.stack), function(i) {
+            nm <- names(test.stack[[i]])
+            j <- which(stretch.vals[,"nms"] == nm)
+            mn <- stretch.vals[j,1]
+            mx <- stretch.vals[j,2]
+            if (cellStats(test.stack[[i]], "min") < mn) {
+                test.stack[[i]][test.stack[[i]] < mn] <- mn
+            }
+            if (cellStats(test.stack[[i]], "max") > mx) {
+                test.stack[[i]][test.stack[[i]] > mx] <- mx
+            }
+
+
+            calc(test.stack[[i]], fun=function(x){((x - mn) * 254)/(mx- mn) + 0},
+                 filename = paste0("data/image/test/int/",names(test.stack[[i]]),".tif"), datatype='INT1U', overwrite = T)
+        })
 
 #+end_src
 
 #+RESULTS:
+: Warning message:
+: In dir.create("data/image/test/int/") :
+:   'data/image/test/int' already exists
 
 #+begin_src R
 test.stack.int <- stack(list.files("data/image/test/int", full.names = T, pattern = ".*.tif$"))
