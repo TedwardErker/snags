@@ -1149,9 +1149,6 @@ writeRaster(r.test, "data/image/test/test.tif")
 
 #+end_src
 
-#+begin_src R
-
-#+end_src
 
 ** convert to integer
 *** stretch
@@ -1163,7 +1160,7 @@ names(test.stack) <- str_match(names(test.stack), "test(.*)")[,2]
 #+RESULTS:
 
 #+begin_src R
-stretch.vals <- read.csv(stretch.vals, "data/training/stretchvals.csv")
+stretch.vals <- read.csv("data/training/stretchvals.csv")
 
   test.stack.int <- lapply(1:nlayers(test.stack), function(i) {
       mn <- stretch.vals[i,1]
