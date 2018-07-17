@@ -1216,3 +1216,8 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 #+end_src
 
 #+RESULTS:
+* Apply Model to NAIP images Cropped to 2km within MYSE captures
+
+#+begin_src R
+
+#+end_src
