@@ -1220,37 +1220,53 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 ** read points
 
 #+begin_src R
-library(readxl)
-library(sp)
-library(rgeos)
-library(maptools)
-d <- read_excel("/home/erker/git/snag/data/NAIPImages/MYSE_captures_2014.xlsx")
-coordinates(d) <- ~long + lat
-proj4string(d) <- CRS("+init=epsg:4326")
+    library(readxl)
+    library(sp)
+    library(rgeos)
+    library(maptools)
+    library(dplyr)
+    d <- read_excel("/home/erker/git/snag/data/NAIPImages/MYSE_captures_2014.xlsx")
+    coordinates(d) <- ~long + lat
+    proj4string(d) <- CRS("+init=epsg:4326")
 
-pts15 <- spTransform(d, CRS("+init=epsg:32615"))
-pts16 <- spTransform(d, CRS("+init=epsg:32616"))
-
-buf15 <- union(gBuffer(pts15, width = 2000, byid = T))
-buf16 <- gBuffer(pts16, width = 2000, byid = T)
-
+    utms <- c("15","16")
+    bufs <- lapply(utms, function(utm) {
+        p <- spTransform(d, CRS(paste0("+init=epsg:326",utm)))
+        buf <- gBuffer(p, width = 2000, byid = T)
+        buf <- gUnion(buf, buf)
+        buf <- disaggregate(buf)
+        buf
+})
+names(bufs) <- c("utm15","utm16")
 #+end_src
 
 #+RESULTS:
-: Error in RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) : 
-:   TopologyException: side location conflict at 676711.0285544541 5072262.1127114557
-: In addition: Warning message:
-: Setting row names on a tibble is deprecated.
-: Warning message:
-: Setting row names on a tibble is deprecated.
+: Warning messages:
+: 1: Setting row names on a tibble is deprecated. 
+: 2: Setting row names on a tibble is deprecated.
 ** read images
 #+begin_src R
-library(raster)
-image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*.tif$")
+    library(raster)
+    image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*.tif$")
 
-images <- lapply(image.files, function(image.file) stack(image.file))
+    images <- lapply(image.files, function(image.file) stack(image.file))
 
-extents <- 
+    extents <- lapply(images, function(i) extent(i))
+    poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
+    poly.extents.merged <- do.call("bind", poly.extents)
+    projs <- sapply(images, function(i) proj4string(i))
+
+    cropped.images <- lapply(1:length(projs), function(i) {
+        out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
+        if(grepl(".*zone=15.*", projs[i])) {
+          crop(images[[i]], bufs$utm15, out.path, overwrite = T)
+        }
+        if(grepl(".*zone=16.*", projs[i])) {
+          crop(images[[i]], bufs$utm16, out.path, overwrite = T)
+        }
+    })
 #+end_src
 
 #+RESULTS:
+: Error in .getGDALtransient(x, filename = filename, options = options,  : 
+:   filename exists; use overwrite=TRUE
