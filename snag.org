@@ -1217,7 +1217,40 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
 #+RESULTS:
 * Apply Model to NAIP images Cropped to 2km within MYSE captures
+** read points
 
 #+begin_src R
-"/home/erker/git/snag/data/NAIPImages/MYSE_captures_2014.xlsx"
+library(readxl)
+library(sp)
+library(rgeos)
+library(maptools)
+d <- read_excel("/home/erker/git/snag/data/NAIPImages/MYSE_captures_2014.xlsx")
+coordinates(d) <- ~long + lat
+proj4string(d) <- CRS("+init=epsg:4326")
+
+pts15 <- spTransform(d, CRS("+init=epsg:32615"))
+pts16 <- spTransform(d, CRS("+init=epsg:32616"))
+
+buf15 <- union(gBuffer(pts15, width = 2000, byid = T))
+buf16 <- gBuffer(pts16, width = 2000, byid = T)
+
 #+end_src
+
+#+RESULTS:
+: Error in RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) : 
+:   TopologyException: side location conflict at 676711.0285544541 5072262.1127114557
+: In addition: Warning message:
+: Setting row names on a tibble is deprecated.
+: Warning message:
+: Setting row names on a tibble is deprecated.
+** read images
+#+begin_src R
+library(raster)
+image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*.tif$")
+
+images <- lapply(image.files, function(image.file) stack(image.file))
+
+extents <- 
+#+end_src
+
+#+RESULTS:
