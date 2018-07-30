@@ -1225,19 +1225,21 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
     library(rgeos)
     library(maptools)
     library(dplyr)
-    d <- read_excel("/home/erker/git/snag/data/NAIPImages/MYSE_captures_2014.xlsx")
+    d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
     coordinates(d) <- ~long + lat
     proj4string(d) <- CRS("+init=epsg:4326")
 
     utms <- c("15","16")
     bufs <- lapply(utms, function(utm) {
-        p <- spTransform(d, CRS(paste0("+init=epsg:326",utm)))
+        p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
         buf <- gBuffer(p, width = 2000, byid = T)
         buf <- gUnion(buf, buf)
         buf <- disaggregate(buf)
         buf
 })
 names(bufs) <- c("utm15","utm16")
+shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
+shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
 #+end_src
 
 #+RESULTS:
@@ -1247,26 +1249,25 @@ names(bufs) <- c("utm15","utm16")
 ** read images
 #+begin_src R
     library(raster)
-    image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*.tif$")
+    image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9].tif$")
 
     images <- lapply(image.files, function(image.file) stack(image.file))
 
     extents <- lapply(images, function(i) extent(i))
     poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
     poly.extents.merged <- do.call("bind", poly.extents)
+shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
     projs <- sapply(images, function(i) proj4string(i))
 
     cropped.images <- lapply(1:length(projs), function(i) {
         out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
         if(grepl(".*zone=15.*", projs[i])) {
-          crop(images[[i]], bufs$utm15, out.path, overwrite = T)
+         mask(images[[i]], bufs$utm15, out.path, overwrite = T, inverse = T)
         }
         if(grepl(".*zone=16.*", projs[i])) {
-          crop(images[[i]], bufs$utm16, out.path, overwrite = T)
+          mask(images[[i]], bufs$utm16, out.path, overwrite = T, inverse = T)
         }
     })
 #+end_src
 
 #+RESULTS:
-: Error in .getGDALtransient(x, filename = filename, options = options,  : 
-:   filename exists; use overwrite=TRUE
