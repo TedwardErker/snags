@@ -1269,7 +1269,7 @@ shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
                        tile.name = tile.name,
                        band.names = c("red","green","blue","nir"),
                        ratio.bands = c("red","green","blue","nir"),
-                       texture = T,
+                       texture = F,
                        texture.params.df = texture.params)
   })
   })
