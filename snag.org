@@ -1261,9 +1261,9 @@ shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
 
     tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
-    lapply(tile.dirs[2:length(tile.dirs)], function(tile.dir) {
+    lapply(tile.dirs, function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
-      lapply(tile.names[2:length(tile.names)], function(tile.name) {
+      lapply(tile.names, function(tile.name) {
 
           add.features(tile.dir = tile.dir,
                        tile.name = tile.name,
