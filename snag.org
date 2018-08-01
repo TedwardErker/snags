@@ -21,7 +21,6 @@ library(randomForest)
 
 #+RESULTS:
 #+begin_example
-Loading required package: sp
 Loading required package: bit
 Attaching package bit
 package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
@@ -39,7 +38,7 @@ The following object is masked from ‘package:base’:
     xor
 
 Attaching package ff
-- getOption("fftempdir")=="/tmp/Rtmp3rFEIi"
+- getOption("fftempdir")=="/tmp/RtmpTrDoLt"
 
 - getOption("ffextension")=="ff"
 
@@ -73,20 +72,6 @@ The following objects are masked from ‘package:utils’:
 The following objects are masked from ‘package:base’:
 
     is.factor, is.ordered
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:raster’:
-
-    intersect, select, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
 randomForest 4.6-14
 Type rfNews() to see new features/changes/bug fixes.
 
@@ -1150,7 +1135,6 @@ writeRaster(r.test, "data/image/test/test.tif")
 
 #+end_src
 
-
 ** convert to integer
 *** stretch
 #+begin_src R
@@ -1246,7 +1230,7 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 : Warning messages:
 : 1: Setting row names on a tibble is deprecated. 
 : 2: Setting row names on a tibble is deprecated.
-** read images
+** read images and crop to 2km
 #+begin_src R
     library(raster)
     image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9].tif$")
@@ -1271,3 +1255,58 @@ shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
 #+end_src
 
 #+RESULTS:
+** add some additional features/layers
+
+#+begin_src R
+
+    tile.dirs <- list.dirs("data/NAIPImages/")[-1]
+
+    lapply(tile.dirs[2:length(tile.dirs)], function(tile.dir) {
+        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
+      lapply(tile.names[2:length(tile.names)], function(tile.name) {
+
+          add.features(tile.dir = tile.dir,
+                       tile.name = tile.name,
+                       band.names = c("red","green","blue","nir"),
+                       ratio.bands = c("red","green","blue","nir"),
+                       texture = T,
+                       texture.params.df = texture.params)
+  })
+  })
+#+end_src
+
+#+RESULTS:
+: Error in .local(.Object, ...) : 
+: 
+: Error in .rasterObjectFromFile(x, objecttype = "RasterBrick", ...) : 
+:   Cannot create a RasterLayer object from this file. (file does not exist)
+
+
+#+begin_src R
+
+  cores <- detectCores() - 1
+
+    cl <- makeCluster(cores)
+    registerDoParallel(cl)
+
+    focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
+    focal.fun <- c("mean","max","min")
+    focal.window.diameter <- c(1,2,4,8,11)
+
+    tile.names <- remove.tif.ext(list.files("data/image/test", focal.feature.pattern))
+
+    focal.param.df <- expand.grid(raster.dir = "data/image/test/",
+                                  raster.name = tile.names,
+                                  fun = focal.fun,
+                                  window.diameter = focal.window.diameter,
+                                  stringsAsFactors = F)
+
+        features <- foreach (i = 1:nrow(focal.param.df),
+                             .packages = c("raster","stringr")) %dopar% {
+                                 make.focal.features(focal.param.df[i,])
+                             }
+
+#+end_src
+
+
+** predict onto cropped images
