@@ -21,6 +21,7 @@ library(randomForest)
 
 #+RESULTS:
 #+begin_example
+Loading required package: sp
 Loading required package: bit
 Attaching package bit
 package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
@@ -38,7 +39,7 @@ The following object is masked from ‘package:base’:
     xor
 
 Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpTrDoLt"
+- getOption("fftempdir")=="/tmp/RtmpFX9Yzd"
 
 - getOption("ffextension")=="ff"
 
@@ -72,6 +73,20 @@ The following objects are masked from ‘package:utils’:
 The following objects are masked from ‘package:base’:
 
     is.factor, is.ordered
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:raster’:
+
+    intersect, select, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
 randomForest 4.6-14
 Type rfNews() to see new features/changes/bug fixes.
 
@@ -1209,6 +1224,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
     library(rgeos)
     library(maptools)
     library(dplyr)
+    library(raster)
     d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
     coordinates(d) <- ~long + lat
     proj4string(d) <- CRS("+init=epsg:4326")
@@ -1227,12 +1243,17 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
+: rgeos version: 0.3-26, (SVN revision 560)
+:  GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
+:  Linking to sp version: 1.2-7 
+:  Polygon checking: TRUE
+: Checking rgeos availability: TRUE
 : Warning messages:
 : 1: Setting row names on a tibble is deprecated. 
 : 2: Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
 #+begin_src R
-    library(raster)
+
     image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9].tif$")
 
     images <- lapply(image.files, function(image.file) stack(image.file))
@@ -1359,26 +1380,29 @@ NULL
 
   cores <- detectCores() - 1
 
-    cl <- makeCluster(cores)
-    registerDoParallel(cl)
+  tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
-    focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
-    focal.fun <- c("mean","max","min")
-    focal.window.diameter <- c(1,2,4,8,11)
-
-    tile.names <- remove.tif.ext(list.files("data/image/test", focal.feature.pattern))
-
-    focal.param.df <- expand.grid(raster.dir = "data/image/test/",
-                                  raster.name = tile.names,
-                                  fun = focal.fun,
-                                  window.diameter = focal.window.diameter,
-                                  stringsAsFactors = F)
-
-        features <- foreach (i = 1:nrow(focal.param.df),
-                             .packages = c("raster","stringr")) %dopar% {
-                                 make.focal.features(focal.param.df[i,])
-                             }
-
+  lapply(tile.dirs[2], function(tile.dir) {
+      tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
+      lapply(tile.names[2], function(tile.name) {
+          cl <- makeCluster(cores)
+          registerDoParallel(cl)
+          focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
+          focal.fun <- c("mean","max","min")
+          focal.window.diameter <- c(1,2,4,8,11)
+          names <- remove.tif.ext(list.files(tile.dir, paste0(tile.name,focal.feature.pattern)))
+          focal.param.df <- expand.grid(raster.dir = tile.dir,
+                                        raster.name = names,
+                                        fun = focal.fun,
+                                        window.diameter = focal.window.diameter,
+                                        stringsAsFactors = F)
+          features <- foreach (i = 1:nrow(focal.param.df),
+                               .packages = c("raster","stringr"),
+                               .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %dopar% {
+                                   make.focal.features(focal.param.df[i,])
+                               }
+      })
+  })
 #+end_src
 
 
