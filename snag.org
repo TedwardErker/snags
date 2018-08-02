@@ -39,7 +39,7 @@ The following object is masked from ‘package:base’:
     xor
 
 Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpFX9Yzd"
+- getOption("fftempdir")=="/tmp/RtmpIMfx20"
 
 - getOption("ffextension")=="ff"
 
@@ -1378,11 +1378,11 @@ NULL
 
 #+begin_src R
 
-  cores <- detectCores() - 1
+  cores <- 3
 
   tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
-  lapply(tile.dirs[2], function(tile.dir) {
+  lapply(tile.dirs[1], function(tile.dir) {
       tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
       lapply(tile.names[2], function(tile.name) {
           cl <- makeCluster(cores)
