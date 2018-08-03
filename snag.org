@@ -1385,8 +1385,8 @@ NULL
   lapply(tile.dirs, function(tile.dir) {
       tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
       lapply(tile.names, function(tile.name) {
-          cl <- makeCluster(cores)
-          registerDoParallel(cl)
+#          cl <- makeCluster(cores)
+ #         registerDoParallel(cl)
           focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
           focal.fun <- c("mean","max","min")
           focal.window.diameter <- c(1,2,4,8,11)
@@ -1396,9 +1396,9 @@ NULL
                                         fun = focal.fun,
                                         window.diameter = focal.window.diameter,
                                         stringsAsFactors = F)
-          features <- foreach (i = 29:nrow(focal.param.df),   ################## FIX THE 29...
+          features <- foreach (i = 56:nrow(focal.param.df),   ################## FIX THE 56...
                                .packages = c("raster","stringr"),
-                               .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %dopar% {
+                               .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %do% {
                                    make.focal.features(focal.param.df[i,])
                                }
       })
