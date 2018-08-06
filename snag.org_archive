@@ -161,3 +161,44 @@ saveRDS(df, "data/training/model_building_df.rds")
 
 
 
+
+* convert to integer
+:PROPERTIES:
+:ARCHIVE_TIME: 2018-08-06 Mon 13:19
+:ARCHIVE_FILE: ~/git/snag/snag.org
+:ARCHIVE_CATEGORY: snag
+:END:
+** save values to stretch the image (this will be needed to apply elsewhere)
+#+BEGIN_SRC R
+mns <- minValue(train.stack)
+mxs <- maxValue(train.stack)
+nms <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
+stretch.vals <- cbind(mns,mxs,nms)
+write.csv(stretch.vals, "data/training/stretchvals.csv", row.names = F)
+#+END_SRC
+
+#+RESULTS:
+
+** stretch
+#+begin_src R
+  train.stack.int <- lapply(1:nlayers(train.stack), function(i) {
+      mn <- stretch.vals[i,1]
+      mx <- stretch.vals[i,2]
+      calc(train.stack[[i]], fun=function(x){((x - mn) * 254)/(mx- mn) + 0},
+           filename = paste0("data/image/train/int/",names(train.stack[[i]]),".tif"), datatype='INT1U', overwrite = T)
+  })
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+train.stack.int <- stack(list.files("data/image/train/int", full.names = T, pattern = ".*.tif$"))
+
+#+end_src
+
+#+begin_src R
+writeRaster(train.stack.int, "data/image/train/int/stacked.tif")
+#+end_src
+
+#+RESULTS:
