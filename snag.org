@@ -39,7 +39,7 @@ The following object is masked from ‘package:base’:
     xor
 
 Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpvwAdlN"
+- getOption("fftempdir")=="/tmp/RtmpU5OLSn"
 
 - getOption("ffextension")=="ff"
 
