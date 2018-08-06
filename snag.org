@@ -20,84 +20,6 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
-#+begin_example
-Loading required package: sp
-Loading required package: bit
-Attaching package bit
-package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
-creators: bit bitwhich
-coercion: as.logical as.integer as.bit as.bitwhich which
-operator: ! & | xor != ==
-querying: print length any all min max range sum summary
-bit access: length<- [ [<- [[ [[<-
-for more help type ?bit
-
-Attaching package: ‘bit’
-
-The following object is masked from ‘package:base’:
-
-    xor
-
-Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpZb6tr8"
-
-- getOption("ffextension")=="ff"
-
-- getOption("ffdrop")==TRUE
-
-- getOption("fffinonexit")==TRUE
-
-- getOption("ffpagesize")==65536
-
-- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
-
-- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
-
-- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
-
-
-Attaching package: ‘ff’
-
-The following objects are masked from ‘package:bit’:
-
-    clone, clone.default, clone.list
-
-The following objects are masked from ‘package:raster’:
-
-    filename, is.factor, ncol<-, nrow<-
-
-The following objects are masked from ‘package:utils’:
-
-    write.csv, write.csv2
-
-The following objects are masked from ‘package:base’:
-
-    is.factor, is.ordered
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:raster’:
-
-    intersect, select, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-randomForest 4.6-14
-Type rfNews() to see new features/changes/bug fixes.
-
-Attaching package: ‘randomForest’
-
-The following object is masked from ‘package:dplyr’:
-
-    combine
-Loading required package: foreach
-Loading required package: iterators
-#+end_example
 
 * bits
 ** texture params
@@ -1005,83 +927,94 @@ mod_all <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+RESULTS:
 
 #+begin_src R
-top <- arrange(data.frame(importance(mod_all), name = row.names(importance(mod_all))), -MeanDecreaseGini) %>% head(70)
+top <- arrange(data.frame(importance(mod_all), name = row.names(importance(mod_all))), -MeanDecreaseGini) %>% head(80)
 top
 #+end_src
 
 #+RESULTS:
 #+begin_example
-   MeanDecreaseGini                                   name
-1         1376.8802     X_ratio.nir_windowcircle.1_fun.max
-2         1375.4380    X_ratio.nir_windowcircle.2_fun.mean
-3         1336.9756                            X_ratio.nir
-4         1272.3591    X_ratio.nir_windowcircle.1_fun.mean
-5         1146.0025    X_ratio.blue_windowcircle.1_fun.max
-6         1090.5488   X_ratio.blue_windowcircle.1_fun.mean
-7         1074.2114    X_ratio.nir_windowcircle.4_fun.mean
-8         1073.6890   X_ratio.blue_windowcircle.2_fun.mean
-9          909.1844    X_ratio.blue_windowcircle.2_fun.max
-10         851.8482         X_ndvi_windowcircle.4_fun.mean
-11         833.3299                           X_ratio.blue
-12         822.2292   X_ratio.blue_windowcircle.4_fun.mean
-13         797.4117     X_ratio.nir_windowcircle.1_fun.min
-14         739.1410         X_ndvi_windowcircle.1_fun.mean
-15         723.1913                                 X_ndvi
-16         690.0027                                X_green
-17         661.5017         X_ndvi_windowcircle.2_fun.mean
-18         660.4274          X_nir_windowcircle.1_fun.mean
-19         603.4051                                  X_nir
-20         589.6150     X_ratio.nir_windowcircle.2_fun.max
-21         541.5665           X_nir_windowcircle.1_fun.min
-22         532.4910          X_ndvi_windowcircle.1_fun.max
-23         520.4345   X_ratio.blue_windowcircle.8_fun.mean
-24         510.8755        X_green_windowcircle.1_fun.mean
-25         501.7262     X_ratio.nir_windowcircle.2_fun.min
-26         501.4541          X_nir_windowcircle.2_fun.mean
-27         496.4758    X_ratio.blue_windowcircle.1_fun.min
-28         492.4521 X_ratio.green_windowcircle.11_fun.mean
-29         490.4454    X_ratio.nir_windowcircle.8_fun.mean
-30         478.6452        X_green_windowcircle.2_fun.mean
-31         476.3758   X_ratio.nir_windowcircle.11_fun.mean
-32         412.3734                          X_ratio.green
-33         410.8720          X_nir_windowcircle.4_fun.mean
-34         409.0013           X_nir_windowcircle.1_fun.max
-35         386.9035         X_ndvi_windowcircle.8_fun.mean
-36         378.3353          X_ndvi_windowcircle.2_fun.max
-37         372.2920         X_nir_windowcircle.11_fun.mean
-38         363.1936  X_ratio.green_windowcircle.1_fun.mean
-39         355.3391         X_green_windowcircle.1_fun.max
-40         349.8741           X_nir_windowcircle.2_fun.min
-41         324.3099        X_green_windowcircle.4_fun.mean
-42         298.5201  X_ratio.green_windowcircle.8_fun.mean
-43         295.9354  X_ratio.blue_windowcircle.11_fun.mean
-44         282.6886  X_ratio.green_windowcircle.2_fun.mean
-45         279.0789          X_nir_windowcircle.8_fun.mean
-46         272.4917     X_ratio.nir_windowcircle.4_fun.max
-47         265.0789          X_ndvi_windowcircle.1_fun.min
-48         257.3111        X_ndvi_windowcircle.11_fun.mean
-49         251.1407    X_ratio.red_windowcircle.2_fun.mean
-50         233.4185    X_ratio.blue_windowcircle.4_fun.max
-51         231.0655     X_ratio.red_windowcircle.1_fun.min
-52         230.7811         X_green_windowcircle.2_fun.max
-53         228.0394     X_ratio.red_windowcircle.2_fun.min
-54         220.1098   X_ratio.green_windowcircle.1_fun.max
-55         215.2474       X_green_windowcircle.11_fun.mean
-56         212.6815         X_green_windowcircle.1_fun.min
-57         199.5540    X_ratio.blue_windowcircle.2_fun.min
-58         181.2823  X_ratio.green_windowcircle.4_fun.mean
-59         178.6562    X_ratio.red_windowcircle.1_fun.mean
-60         173.8494        X_green_windowcircle.8_fun.mean
-61         163.2459                                 X_blue
-62         160.6466          X_ndvi_windowcircle.4_fun.max
-63         153.8674    X_ratio.red_windowcircle.4_fun.mean
-64         145.5133           X_nir_windowcircle.4_fun.min
-65         137.2568         X_blue_windowcircle.1_fun.mean
-66         135.7630          X_ndvi_windowcircle.2_fun.min
-67         134.4025     X_ratio.nir_windowcircle.4_fun.min
-68         127.4230           X_nir_windowcircle.2_fun.max
-69         126.6767          X_red_windowcircle.2_fun.mean
-70         122.6344          X_red_windowcircle.1_fun.mean
+ 
+  MeanDecreaseGini                                   name
+1         1640.1440                            X_ratio.nir
+2         1533.7017    X_ratio.nir_windowcircle.2_fun.mean
+3         1443.6140    X_ratio.nir_windowcircle.1_fun.mean
+4         1090.3642    X_ratio.nir_windowcircle.4_fun.mean
+5         1065.6507     X_ratio.nir_windowcircle.1_fun.max
+6         1033.2914    X_ratio.blue_windowcircle.1_fun.max
+7          999.3715     X_ratio.nir_windowcircle.1_fun.min
+8          987.8498   X_ratio.blue_windowcircle.2_fun.mean
+9          952.8966    X_ratio.blue_windowcircle.2_fun.max
+10         941.2373   X_ratio.blue_windowcircle.1_fun.mean
+11         893.0549         X_ndvi_windowcircle.2_fun.mean
+12         828.0100                                  X_nir
+13         809.4786                           X_ratio.blue
+14         795.5489         X_ndvi_windowcircle.1_fun.mean
+15         717.1698     X_ratio.nir_windowcircle.2_fun.max
+16         670.7316   X_ratio.blue_windowcircle.4_fun.mean
+17         643.2662    X_ratio.nir_windowcircle.8_fun.mean
+18         598.0511          X_ndvi_windowcircle.1_fun.max
+19         587.0403        X_green_windowcircle.1_fun.mean
+20         566.2538    X_ratio.blue_windowcircle.1_fun.min
+21         544.1973                                X_green
+22         538.5823          X_nir_windowcircle.1_fun.mean
+23         529.6685                                 X_ndvi
+24         528.0749          X_nir_windowcircle.2_fun.mean
+25         499.9986   X_ratio.blue_windowcircle.8_fun.mean
+26         497.7599           X_nir_windowcircle.2_fun.min
+27         494.7178           X_nir_windowcircle.1_fun.min
+28         483.9616     X_ratio.nir_windowcircle.2_fun.min
+29         457.0824        X_green_windowcircle.2_fun.mean
+30         444.5506  X_ratio.green_windowcircle.8_fun.mean
+31         436.7583         X_green_windowcircle.1_fun.max
+32         410.3372    X_ratio.blue_windowcircle.2_fun.min
+33         405.1898          X_ndvi_windowcircle.2_fun.max
+34         398.4352         X_ndvi_windowcircle.4_fun.mean
+35         398.0578          X_ndvi_windowcircle.1_fun.min
+36         396.9595         X_ndvi_windowcircle.8_fun.mean
+37         378.6807                          X_ratio.green
+38         378.3171  X_ratio.green_windowcircle.1_fun.mean
+39         373.4306 X_ratio.green_windowcircle.11_fun.mean
+40         354.3631  X_ratio.blue_windowcircle.11_fun.mean
+41         343.0435          X_nir_windowcircle.4_fun.mean
+42         339.1149           X_nir_windowcircle.1_fun.max
+43         326.4274         X_nir_windowcircle.11_fun.mean
+44         322.3859   X_ratio.nir_windowcircle.11_fun.mean
+45         317.2545     X_ratio.red_windowcircle.1_fun.min
+46         306.5528          X_nir_windowcircle.8_fun.mean
+47         286.8324    X_ratio.blue_windowcircle.4_fun.max
+48         243.6691        X_green_windowcircle.4_fun.mean
+49         234.6206         X_green_windowcircle.2_fun.max
+50         229.9857  X_ratio.green_windowcircle.2_fun.mean
+51         225.7472   X_ratio.green_windowcircle.1_fun.max
+52         215.9831           X_nir_windowcircle.4_fun.min
+53         205.3678         X_green_windowcircle.1_fun.min
+54         204.4184       X_green_windowcircle.11_fun.mean
+55         204.0322    X_ratio.red_windowcircle.1_fun.mean
+56         183.6173    X_ratio.red_windowcircle.4_fun.mean
+57         164.1707        X_green_windowcircle.8_fun.mean
+58         145.0765        X_ndvi_windowcircle.11_fun.mean
+59         144.3517           X_red_windowcircle.1_fun.max
+60         137.0987                                 X_blue
+61         135.7730   X_ratio.green_windowcircle.2_fun.max
+62         135.4892    X_ratio.red_windowcircle.2_fun.mean
+63         135.2212          X_red_windowcircle.1_fun.mean
+64         131.5687     X_ratio.nir_windowcircle.4_fun.max
+65         131.2847          X_ndvi_windowcircle.2_fun.min
+66         130.7681          X_red_windowcircle.2_fun.mean
+67         128.5292     X_ratio.red_windowcircle.1_fun.max
+68         118.1757           X_red_windowcircle.8_fun.min
+69         117.2487   X_ratio.red_windowcircle.11_fun.mean
+70         115.9708           X_nir_windowcircle.8_fun.min
+71         114.9742                                  X_red
+72         114.2766         X_green_windowcircle.8_fun.min
+73         112.5400          X_blue_windowcircle.1_fun.max
+74         111.3640         X_blue_windowcircle.1_fun.mean
+75         111.3579          X_nir_windowcircle.11_fun.min
+76         110.6782     X_ratio.nir_windowcircle.4_fun.min
+77         107.9479        X_green_windowcircle.11_fun.min
+78         107.2889    X_ratio.red_windowcircle.8_fun.mean
+79         104.3983                            X_ratio.red
+80         102.2546           X_nir_windowcircle.2_fun.max
 #+end_example
 
 build model with top variables
@@ -1090,6 +1023,7 @@ mod <- randomForest(y = factor(df$Class), x= df[,c(as.character(top$name), "X_ra
 #+end_src
 
 #+RESULTS:
+
 
 * predict onto raster
 #+begin_src R
@@ -1345,31 +1279,31 @@ shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
 
 #+begin_src R
 
-  cores <- 2
+    cores <- 2
 
-  tile.dirs <- list.dirs("data/NAIPImages/")[-1]
+    tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
-  lapply(tile.dirs, function(tile.dir) {
-      tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
-      lapply(tile.names, function(tile.name) {
-#          cl <- makeCluster(cores)
- #         registerDoParallel(cl)
-          focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
-          focal.fun <- c("mean","max","min")
-          focal.window.diameter <- c(1,2,4,8,11)
-          names <- remove.tif.ext(list.files(tile.dir, paste0(tile.name,focal.feature.pattern)))
-          focal.param.df <- expand.grid(raster.dir = tile.dir,
-                                        raster.name = names,
-                                        fun = focal.fun,
-                                        window.diameter = focal.window.diameter,
-                                        stringsAsFactors = F)
-          features <- foreach (i = 1:nrow(focal.param.df),
-                               .packages = c("raster","stringr"),
-                               .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %do% {
-                                   make.focal.features(focal.param.df[i,])
-                               }
-      })
-  })
+    lapply(tile.dirs, function(tile.dir) {
+        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
+        lapply(tile.names, function(tile.name) {
+  #          cl <- makeCluster(cores)
+   #         registerDoParallel(cl)
+            focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
+            focal.fun <- c("mean","max","min")
+            focal.window.diameter <- c(1,2,4,8,11)
+            names <- remove.tif.ext(list.files(tile.dir, paste0(tile.name,focal.feature.pattern)))
+            focal.param.df <- expand.grid(raster.dir = tile.dir,
+                                          raster.name = names,
+                                          fun = focal.fun,
+                                          window.diameter = focal.window.diameter,
+                                          stringsAsFactors = F)
+            features <- foreach (i = 1:nrow(focal.param.df),
+                                 .packages = c("raster","stringr"),
+                                 .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %do% {
+                                     make.focal.features(focal.param.df[i,])
+                                 }
+        })
+    })
 #+end_src
 
 
