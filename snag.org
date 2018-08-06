@@ -289,7 +289,7 @@ Loading required package: iterators
       res(r) <- rs
       fw <- myfocalWeight(r, window.diameter, type = window.shape)
       if(fun == "min")    fw[fw==0] <- NA  # if fun is min and fw has 0's in it, the raster becomes 0's
-      out <- focal(r, match.fun(fun), w = fw, na.rm = T, pad = T)
+      out <- focal(r, match.fun(fun), w = fw, na.rm = T, pad = T) * sum(fw != 0)
       names(out) <- paste0(names(r), "_window",window.shape,"-",window.diameter,"_fun-",fun)
       writeRaster(out, file = str_c(raster.dir,"/",names(out),".tif"), overwrite = T, datatype = 'INT1U')
       return(out)
@@ -873,7 +873,7 @@ plot(s, add = T)
                  tile.name = "m_4409047_ne_15_1_20130701_train",
                  band.names = c("red","green","blue","nir"),
                  ratio.bands = c("red","green","blue","nir"),
-                 texture = T,
+                 texture = F,
                  texture.params.df = texture.params)
 
 #+end_src
@@ -908,46 +908,9 @@ plot(s, add = T)
 
 #+end_src
 
-#+RESULTS:
-
 * stack training
 #+begin_src R
 train.stack <- stack(list.files("data/image/train", full.names = T, pattern = ".*.tif$"))
-#+end_src
-
-#+RESULTS:
-* convert to integer
-** save values to stretch the image (this will be needed to apply elsewhere)
-#+BEGIN_SRC R
-mns <- minValue(train.stack)
-mxs <- maxValue(train.stack)
-nms <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
-stretch.vals <- cbind(mns,mxs,nms)
-write.csv(stretch.vals, "data/training/stretchvals.csv", row.names = F)
-#+END_SRC
-
-#+RESULTS:
-
-** stretch
-#+begin_src R
-  train.stack.int <- lapply(1:nlayers(train.stack), function(i) {
-      mn <- stretch.vals[i,1]
-      mx <- stretch.vals[i,2]
-      calc(train.stack[[i]], fun=function(x){((x - mn) * 254)/(mx- mn) + 0},
-           filename = paste0("data/image/train/int/",names(train.stack[[i]]),".tif"), datatype='INT1U', overwrite = T)
-  })
-
-#+end_src
-
-#+RESULTS:
-
-#+begin_src R
-train.stack.int <- stack(list.files("data/image/train/int", full.names = T, pattern = ".*.tif$"))
-
-#+end_src
-
-#+begin_src R
-writeRaster(train.stack.int, "data/image/train/int/stacked.tif")
 #+end_src
 
 #+RESULTS:
@@ -959,12 +922,6 @@ other <- raster("data/training/other.png")
 livetree <- raster("data/training/livetree.png")
 liveveg <- raster("data/training/liveveg.png")
 
-#+end_src
-
-#+RESULTS:
-
-#+begin_src R
-    train.stack.int <- stack(list.files("data/image/train/int", full.names = T, pattern = ".*.tif$"))
 #+end_src
 
 #+RESULTS:
@@ -987,25 +944,23 @@ liveveg <- raster("data/training/liveveg.png")
 
 #+RESULTS:
 
-#+begin_src R :eval no
+#+begin_src R :eval yes
 
-  mat <- ff(vmode="integer",dim=c(ncell(train.stack.int),nlayers(train.stack.int)),filename="data/image/train/trainstack.ffdata")
+  mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename="data/image/train/trainstack.ffdata")
 
-  for(i in 1:nlayers(train.stack.int)){
-      mat[,i] <- train.stack.int[[i]][]
+  for(i in 1:nlayers(train.stack)){
+      mat[,i] <- train.stack[[i]][]
   }
 
   save(mat,file="data/image/train/train_stack_mat.RData")
 
 #+end_src
 
-#+RESULTS:
-
 #+begin_src R
   extracted.values <- mat[ext_ID$cell,]
 
   df <- data.frame(extracted.values)
-  colnames(df) <- paste0("X",str_match(names(train.stack.int), "train(.*)")[,2])
+  colnames(df) <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
 
   df$Class <- factor(ext_ID$Class)
 #+end_src
