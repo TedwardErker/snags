@@ -291,7 +291,7 @@ Loading required package: iterators
       if(fun == "min")    fw[fw==0] <- NA  # if fun is min and fw has 0's in it, the raster becomes 0's
       out <- focal(r, match.fun(fun), w = fw, na.rm = T, pad = T)
       names(out) <- paste0(names(r), "_window",window.shape,"-",window.diameter,"_fun-",fun)
-      writeRaster(out, file = str_c(raster.dir,"/",names(out),".tif"), overwrite = T)
+      writeRaster(out, file = str_c(raster.dir,"/",names(out),".tif"), overwrite = T, datatype = 'INT1U')
       return(out)
   }
 
@@ -1040,7 +1040,84 @@ df <- df %>% na.omit()
 #+RESULTS:
 
 #+begin_src R
-mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+mod_all <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+#+end_src
+
+#+RESULTS:
+
+#+begin_src R
+top <- arrange(data.frame(importance(mod_all), name = row.names(importance(mod_all))), -MeanDecreaseGini) %>% head(60)
+top
+#+end_src
+
+#+RESULTS:
+#+begin_example
+   MeanDecreaseGini                                   name
+1         1522.2023                            X_ratio.nir
+2         1489.0703     X_ratio.nir_windowcircle.1_fun.max
+3         1309.9762   X_ratio.blue_windowcircle.1_fun.mean
+4         1302.8766    X_ratio.nir_windowcircle.1_fun.mean
+5         1154.7617   X_ratio.blue_windowcircle.2_fun.mean
+6         1126.0801    X_ratio.nir_windowcircle.4_fun.mean
+7         1088.6641                           X_ratio.blue
+8         1036.4599    X_ratio.nir_windowcircle.2_fun.mean
+9          911.0283    X_ratio.blue_windowcircle.2_fun.max
+10         878.2855   X_ratio.blue_windowcircle.4_fun.mean
+11         862.5214    X_ratio.nir_windowcircle.8_fun.mean
+12         795.8846         X_ndvi_windowcircle.1_fun.mean
+13         787.0337        X_green_windowcircle.1_fun.mean
+14         734.3034          X_ndvi_windowcircle.1_fun.max
+15         701.0926                                  X_nir
+16         701.0334                                X_green
+17         665.3156    X_ratio.blue_windowcircle.1_fun.max
+18         631.2133          X_nir_windowcircle.2_fun.mean
+19         626.1483     X_ratio.nir_windowcircle.1_fun.min
+20         592.0365     X_ratio.nir_windowcircle.2_fun.max
+21         586.2152         X_ndvi_windowcircle.4_fun.mean
+22         564.0791         X_ndvi_windowcircle.2_fun.mean
+23         563.0037    X_ratio.blue_windowcircle.1_fun.min
+24         552.0771          X_nir_windowcircle.1_fun.mean
+25         520.1432   X_ratio.nir_windowcircle.11_fun.mean
+26         510.6090           X_nir_windowcircle.1_fun.min
+27         484.9124          X_ndvi_windowcircle.1_fun.min
+28         482.1171   X_ratio.blue_windowcircle.8_fun.mean
+29         446.4232    X_ratio.red_windowcircle.4_fun.mean
+30         439.9988         X_ndvi_windowcircle.8_fun.mean
+31         432.2918  X_ratio.green_windowcircle.1_fun.mean
+32         407.5300         X_green_windowcircle.1_fun.max
+33         405.8366                          X_ratio.green
+34         388.4868          X_nir_windowcircle.8_fun.mean
+35         384.8573  X_ratio.blue_windowcircle.11_fun.mean
+36         380.5235     X_ratio.nir_windowcircle.2_fun.min
+37         371.9038  X_ratio.green_windowcircle.8_fun.mean
+38         356.7614        X_green_windowcircle.2_fun.mean
+39         353.8284 X_ratio.green_windowcircle.11_fun.mean
+40         352.9348           X_nir_windowcircle.1_fun.max
+41         346.5033           X_nir_windowcircle.2_fun.min
+42         324.2200     X_ratio.nir_windowcircle.4_fun.max
+43         322.3989                                 X_ndvi
+44         290.2302  X_ratio.green_windowcircle.2_fun.mean
+45         288.8236          X_nir_windowcircle.4_fun.mean
+46         255.8812    X_ratio.blue_windowcircle.4_fun.max
+47         228.9905        X_green_windowcircle.4_fun.mean
+48         224.3998          X_ndvi_windowcircle.2_fun.max
+49         222.8165          X_ndvi_windowcircle.4_fun.max
+50         220.5730         X_green_windowcircle.2_fun.max
+51         215.9655    X_ratio.red_windowcircle.1_fun.mean
+52         208.5024    X_ratio.red_windowcircle.2_fun.mean
+53         205.1302        X_ndvi_windowcircle.11_fun.mean
+54         196.3517    X_ratio.blue_windowcircle.2_fun.min
+55         194.6854     X_ratio.red_windowcircle.1_fun.min
+56         192.9053     X_ratio.red_windowcircle.2_fun.min
+57         189.3127         X_nir_windowcircle.11_fun.mean
+58         176.7835          X_red_windowcircle.1_fun.mean
+59         172.8246           X_nir_windowcircle.8_fun.min
+60         169.3344         X_red_windowcircle.11_fun.mean
+#+end_example
+
+build model with top variables
+#+begin_src R
+mod <- randomForest(y = factor(df$Class), x= df[,c(as.character(top$name), "X_ratio.red","X_blue", "X_red")])
 #+end_src
 
 #+RESULTS:
