@@ -1363,7 +1363,7 @@ shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
                                         fun = focal.fun,
                                         window.diameter = focal.window.diameter,
                                         stringsAsFactors = F)
-          features <- foreach (i = 56:nrow(focal.param.df),   ################## FIX THE 56...
+          features <- foreach (i = 1:nrow(focal.param.df),
                                .packages = c("raster","stringr"),
                                .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %do% {
                                    make.focal.features(focal.param.df[i,])
