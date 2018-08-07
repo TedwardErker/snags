@@ -1223,39 +1223,70 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
-: rgeos version: 0.3-26, (SVN revision 560)
-:  GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
-:  Linking to sp version: 1.2-7 
-:  Polygon checking: TRUE
-: Checking rgeos availability: TRUE
-: Warning messages:
-: 1: Setting row names on a tibble is deprecated. 
-: 2: Setting row names on a tibble is deprecated.
+#+begin_example
+rgeos version: 0.3-26, (SVN revision 560)
+ GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
+ Linking to sp version: 1.2-7 
+ Polygon checking: TRUE
+Checking rgeos availability: TRUE
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:rgeos’:
+
+    intersect, setdiff, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Attaching package: ‘raster’
+
+The following object is masked from ‘package:dplyr’:
+
+    select
+Warning messages:
+1: Setting row names on a tibble is deprecated. 
+2: Setting row names on a tibble is deprecated.
+#+end_example
 ** read images and crop to 2km
 #+begin_src R
 
-    image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9].tif$")
+      image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9].tif$")
 
-    images <- lapply(image.files, function(image.file) stack(image.file))
+      images <- lapply(image.files, function(image.file) stack(image.file))
 
-    extents <- lapply(images, function(i) extent(i))
-    poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
-    poly.extents.merged <- do.call("bind", poly.extents)
-shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
-    projs <- sapply(images, function(i) proj4string(i))
+      extents <- lapply(images, function(i) extent(i))
+      poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
+      poly.extents.merged <- do.call("bind", poly.extents)
+  shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
+      projs <- sapply(images, function(i) proj4string(i))
 
-    cropped.images <- lapply(1:length(projs), function(i) {
-        out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
-        if(grepl(".*zone=15.*", projs[i])) {
-         mask(images[[i]], bufs$utm15, out.path, overwrite = T)
-        }
-        if(grepl(".*zone=16.*", projs[i])) {
-          mask(images[[i]], bufs$utm16, out.path, overwrite = T)
-        }
-    })
+      cropped.images <- lapply(1:length(projs), function(i) {
+          out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
+          if(grepl(".*zone=15.*", projs[i])) {
+           mask(images[[i]], bufs$utm15, out.path, overwrite = T)
+          }
+          if(grepl(".*zone=16.*", projs[i])) {
+              mask(images[[i]], bufs$utm16, out.path, overwrite = T)
+          }
+      })
 #+end_src
 
 #+RESULTS:
+Trim away NA's
+#+begin_src R
+      image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]cropped.tif$")
+
+      images <- lapply(image.files, function(image.file) stack(image.file))
+
+
+
+#+end_src
 ** add some additional features/layers
 
 #+begin_src R
