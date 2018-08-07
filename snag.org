@@ -1267,12 +1267,15 @@ Warning messages:
       projs <- sapply(images, function(i) proj4string(i))
 
       cropped.images <- lapply(1:length(projs), function(i) {
-          out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
+          c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
+          m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked.tif")
           if(grepl(".*zone=15.*", projs[i])) {
-           mask(images[[i]], bufs$utm15, out.path, overwrite = T)
+            ci <- crop(images[[i]], bufs$utm15, c.out.path, overwrite = T)
+            mask(ci, bufs$utm15, m.out.path, overwrite = T)
           }
           if(grepl(".*zone=16.*", projs[i])) {
-              mask(images[[i]], bufs$utm16, out.path, overwrite = T)
+            ci <- crop(images[[i]], bufs$utm16, c.out.path, overwrite = T)
+            mask(ci, bufs$utm16, m.out.path, overwrite = T)
           }
       })
 #+end_src
@@ -1280,9 +1283,13 @@ Warning messages:
 #+RESULTS:
 Trim away NA's
 #+begin_src R
-      image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]cropped.tif$")
+  library(stringr)
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*_cropped.tif$")
 
-      images <- lapply(image.files, function(image.file) stack(image.file))
+  images <- lapply(image.files, function(image.file) stack(image.file))
+
+  trimmed.images <- lapply(1:length(images), function(i) trim(images[[i]], filename = paste0(str_extract(image.files[i], ".*cropped"),"_trimmed.tif")))
+
 
 
 
