@@ -1256,31 +1256,67 @@ Warning messages:
 ** read images and crop to 2km
 #+begin_src R
 
-      image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9].tif$")
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}.tif$")
 
-      images <- lapply(image.files, function(image.file) stack(image.file))
+  images <- lapply(image.files, function(image.file) stack(image.file))
 
-      extents <- lapply(images, function(i) extent(i))
-      poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
-      poly.extents.merged <- do.call("bind", poly.extents)
+  extents <- lapply(images, function(i) extent(i))
+  poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
+  poly.extents.merged <- do.call("bind", poly.extents)
   shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
-      projs <- sapply(images, function(i) proj4string(i))
+  projs <- sapply(images, function(i) proj4string(i))
 
-      cropped.images <- lapply(6:length(projs), function(i) {             # skipping the black river, because they are already trimmed
-          c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
-          m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked.tif")
-          if(grepl(".*zone=15.*", projs[i])) {
-            ci <- crop(images[[i]], bufs$utm15, c.out.path, overwrite = T)
-            mask(ci, bufs$utm15, m.out.path, overwrite = T)
-          }
-          if(grepl(".*zone=16.*", projs[i])) {
-            ci <- crop(images[[i]], bufs$utm16, c.out.path, overwrite = T)
-            mask(ci, bufs$utm16, m.out.path, overwrite = T)
-          }
-      })
+  cropped.images <- lapply(6:length(projs), function(i) {             # skipping the black river, because they are already trimmed
+
+      if(grepl(".*zone=15.*", projs[i])) {
+          ci <- lapply(1:length(bufs$utm15), function(j) {
+              c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
+              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
+              if(gIntersects(poly.extents.merged[i,], bufs$utm15[j,])) {
+                  c1 <- crop(images[[i]], bufs$utm15[j,], filename = c.out.path, overwrite = T)
+                  m1 <- trim(mask(c1, bufs$utm15[j,]), filename = m.out.path, overwrite = T)
+                
+              }
+          })
+      }
+
+      if(grepl(".*zone=16.*", projs[i])) {
+          ci <- lapply(1:length(bufs$utm16), function(j) {
+              c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
+              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
+              if(gIntersects(poly.extents.merged[i,], bufs$utm16[j,])) {
+                  c1 <- crop(images[[i]], bufs$utm16[j,], filename = c.out.path, overwrite = T)
+                  m1 <- trim(mask(c1, bufs$utm16[j,]), filename = m.out.path, overwrite = T)
+              }
+          })
+      }
+
+  })
 #+end_src
 
 #+RESULTS:
+#+begin_example
+Error in r - padding : non-numeric argument to binary operator
+In addition: Warning messages:
+1: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+2: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+3: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+4: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+5: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+6: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+7: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+8: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+9: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
+  spgeom1 and spgeom2 have different proj4 strings
+#+end_example
 Trim away NA's
 #+begin_src R
   library(stringr)
