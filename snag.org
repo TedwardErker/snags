@@ -1266,28 +1266,29 @@ Warning messages:
   shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
   projs <- sapply(images, function(i) proj4string(i))
 
-  cropped.images <- lapply(6:length(projs), function(i) {             # skipping the black river, because they are already trimmed
+  cropped.images <- lapply(1:length(projs), function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
-              c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
+              #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
               m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
-              t.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_trimmed_",j,".tif")
+            
               if(gIntersects(poly.extents.merged[i,], bufs$utm15[j,])) {
-                  c1 <- crop(images[[i]], bufs$utm15[j,], filename = c.out.path, overwrite = T)
-                  m1 <- mask(c1, bufs$utm15[j,], filename = m.out.path, overwrite = T)
-                  m1 <- trim(m1, filename = m.out.path, overwrite = T)
+                  c1 <- crop(images[[i]], bufs$utm15[j,])   #, filename = c.out.path, overwrite = T)
+                  m1 <- mask(c1, bufs$utm15[j,])   #, filename = m.out.path, overwrite = T)
+                  t1 <- trim(m1, filename = m.out.path, overwrite = T)
               }
           })
       }
 
       if(grepl(".*zone=16.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm16), function(j) {
-              c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
+              #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
               m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
               if(gIntersects(poly.extents.merged[i,], bufs$utm16[j,])) {
-                  c1 <- crop(images[[i]], bufs$utm16[j,], filename = c.out.path, overwrite = T)
-                  m1 <- trim(mask(c1, bufs$utm16[j,]), filename = m.out.path, overwrite = T)
+                  c1 <- crop(images[[i]], bufs$utm16[j,])   #, filename = c.out.path, overwrite = T)
+                  m1 <- mask(c1, bufs$utm16[j,])   #, filename = m.out.path, overwrite = T)
+                  t1 <- trim(m1, filename = m.out.path, overwrite = T)
               }
           })
       }
