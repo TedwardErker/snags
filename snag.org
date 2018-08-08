@@ -1266,7 +1266,7 @@ Warning messages:
   shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
       projs <- sapply(images, function(i) proj4string(i))
 
-      cropped.images <- lapply(1:length(projs), function(i) {
+      cropped.images <- lapply(6:length(projs), function(i) {             # skipping the black river, because they are already trimmed
           c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped.tif")
           m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked.tif")
           if(grepl(".*zone=15.*", projs[i])) {
@@ -1289,8 +1289,6 @@ Trim away NA's
   images <- lapply(image.files, function(image.file) stack(image.file))
 
   trimmed.images <- lapply(1:length(images), function(i) trim(images[[i]], filename = paste0(str_extract(image.files[i], ".*cropped"),"_trimmed.tif")))
-
-
 
 
 #+end_src
