@@ -202,3 +202,22 @@ writeRaster(train.stack.int, "data/image/train/int/stacked.tif")
 #+end_src
 
 #+RESULTS:
+
+* old trim
+:PROPERTIES:
+:ARCHIVE_TIME: 2018-08-08 Wed 14:21
+:ARCHIVE_FILE: ~/git/snag/snag.org
+:ARCHIVE_OLPATH: Apply Model to NAIP images Cropped to 2km within MYSE captures/read images and crop to 2km
+:ARCHIVE_CATEGORY: snag
+:END:
+Trim away NA's
+#+begin_src R
+  library(stringr)
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*_cropped.tif$")
+
+  images <- lapply(image.files, function(image.file) stack(image.file))
+
+  trimmed.images <- lapply(1:length(images), function(i) trim(images[[i]], filename = paste0(str_extract(image.files[i], ".*cropped"),"_trimmed.tif")))
+
+
+#+end_src

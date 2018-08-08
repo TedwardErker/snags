@@ -1266,7 +1266,7 @@ Warning messages:
   shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
   projs <- sapply(images, function(i) proj4string(i))
 
-  cropped.images <- lapply(1:length(projs), function(i) {
+gg^  cropped.images <- lapply(1:length(projs), function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
@@ -1294,41 +1294,6 @@ Warning messages:
       }
 
   })
-#+end_src
-
-#+RESULTS:
-#+begin_example
-Error in r - padding : non-numeric argument to binary operator
-In addition: Warning messages:
-1: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-2: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-3: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-4: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-5: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-6: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-7: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-8: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-9: In RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) :
-  spgeom1 and spgeom2 have different proj4 strings
-#+end_example
-Trim away NA's
-#+begin_src R
-  library(stringr)
-  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*_cropped.tif$")
-
-  images <- lapply(image.files, function(image.file) stack(image.file))
-
-  trimmed.images <- lapply(1:length(images), function(i) trim(images[[i]], filename = paste0(str_extract(image.files[i], ".*cropped"),"_trimmed.tif")))
-
-
 #+end_src
 ** add some additional features/layers
 
