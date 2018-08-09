@@ -1304,7 +1304,7 @@ Warning messages:
     tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
     lapply(tile.dirs, function(tile.dir) {
-        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
+        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
           add.features(tile.dir = tile.dir,
@@ -1317,6 +1317,10 @@ Warning messages:
   })
 #+end_src
 
+#+RESULTS:
+: Error in add.features(tile.dir = tile.dir, tile.name = tile.name, band.names = c("red",  (from #5) : 
+:   could not find function "add.features"
+
 
 #+begin_src R
   cores <- 2
@@ -1324,7 +1328,7 @@ Warning messages:
   tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
   lapply(tile.dirs, function(tile.dir) {
-      tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_cropped.tif$"))
+      tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
                                           #          cl <- makeCluster(cores)
                                           #         registerDoParallel(cl)
