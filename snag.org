@@ -1275,8 +1275,9 @@ Warning messages:
 
               if(gIntersects(poly.extents.merged[i,], bufs$utm15[j,])) {
                   c1 <- crop(images[[i]], bufs$utm15[j,])   #, filename = c.out.path, overwrite = T)
-                  m1 <- mask(c1, bufs$utm15[j,], filename = m.out.path, overwrite = T)
-                  t1 <- trim(m1, filename = m.out.path, overwrite = T)
+                  m1 <- mask(c1, bufs$utm15[j,]) #, filename = m.out.path, overwrite = T)
+                  t1 <- trim(m1) #, filename = m.out.path, overwrite = T)
+                  writeRaster(t1, filename = m.out.path, overwrite = T)
               }
           })
       }
@@ -1287,8 +1288,9 @@ Warning messages:
               m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
               if(gIntersects(poly.extents.merged[i,], bufs$utm16[j,])) {
                   c1 <- crop(images[[i]], bufs$utm16[j,])   #, filename = c.out.path, overwrite = T)
-                  m1 <- mask(c1, bufs$utm16[j,], filename = m.out.path, overwrite = T)
-                  t1 <- trim(m1, filename = m.out.path, overwrite = T)
+                  m1 <- mask(c1, bufs$utm16[j,]) #, filename = m.out.path, overwrite = T)
+                  t1 <- trim(m1) #, filename = m.out.path, overwrite = T)
+                  writeRaster(t1, filename = m.out.path, overwrite = T)
               }
           })
       }
