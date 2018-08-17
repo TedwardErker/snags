@@ -1370,6 +1370,22 @@ Warning messages:
 
   })
 #+end_src
+** save those cropped as pngs
+#+begin_src R
+  library(raster)
+  library(tiff)
+    image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}_masked_[0-9]+.tif$")
+
+  a <- brick(image.files[[1]])
+
+  writeRaster(a, "data/NAIPImages/Black River SF 2013/test.tif", options = c("PHOTOMETRIC=RGB", "ALPHA=YES"), datatype = "INT1U", overwrite = T)
+
+#+end_src
+
+#+RESULTS:
+: Warning message:
+: In .datatype(...) : INITU is an invalid datatype value, changed to "FLT4S"
+
 ** add some additional features/layers
 
 #+begin_src R
