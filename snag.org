@@ -1427,7 +1427,7 @@ Warning messages:
 
   tile.dirs <- list.dirs("data/NAIPImages/")[-1]
 
-  tile.dirs <- tile.dirs[3]
+  tile.dirs <- tile.dirs[1]
 
   lapply(tile.dirs, function(tile.dir) {
       tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_masked_[0-9]+.tif$"))
