@@ -1310,42 +1310,19 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
-#+begin_example
-rgeos version: 0.3-26, (SVN revision 560)
- GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
- Linking to sp version: 1.2-7 
- Polygon checking: TRUE
-Checking rgeos availability: TRUE
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:rgeos’:
-
-    intersect, setdiff, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Attaching package: ‘raster’
-
-The following object is masked from ‘package:dplyr’:
-
-    select
-Warning messages:
-1: Setting row names on a tibble is deprecated. 
-2: Setting row names on a tibble is deprecated.
-#+end_example
+: Warning messages:
+: 1: Setting row names on a tibble is deprecated. 
+: 2: Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
 #+begin_src R
 
-  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}.tif$")
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}.tif$")[1:5]
 
   images <- lapply(image.files, function(image.file) stack(image.file))
+
+  outdirs <- tools::file_path_sans_ext(image.files)
+
+  sapply(outdirs, dir.create)
 
   extents <- lapply(images, function(i) extent(i))
   poly.extents <- lapply(extents, function(extent) as(extent, "SpatialPolygons"))
@@ -1358,13 +1335,13 @@ Warning messages:
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
               #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
-              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
+              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"/masked_",j,".tif")
 
               if(gIntersects(poly.extents.merged[i,], bufs$utm15[j,])) {
                   c1 <- crop(images[[i]], bufs$utm15[j,])   #, filename = c.out.path, overwrite = T)
                   m1 <- mask(c1, bufs$utm15[j,]) #, filename = m.out.path, overwrite = T)
                   t1 <- trim(m1) #, filename = m.out.path, overwrite = T)
-                  writeRaster(t1, filename = m.out.path, overwrite = T)
+                  writeRaster(t1, filename = m.out.path, overwrite = T, options = c("PHOTOMETRIC=RGB", "ALPHA=YES"), datatype = "INT1U")
               }
           })
       }
@@ -1372,18 +1349,18 @@ Warning messages:
       if(grepl(".*zone=16.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm16), function(j) {
               #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
-              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_masked_",j,".tif")
+              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"/masked_",j,".tif")
               if(gIntersects(poly.extents.merged[i,], bufs$utm16[j,])) {
                   c1 <- crop(images[[i]], bufs$utm16[j,])   #, filename = c.out.path, overwrite = T)
                   m1 <- mask(c1, bufs$utm16[j,]) #, filename = m.out.path, overwrite = T)
                   t1 <- trim(m1) #, filename = m.out.path, overwrite = T)
-                  writeRaster(t1, filename = m.out.path, overwrite = T)
+                  writeRaster(t1, filename = m.out.path, overwrite = T, options = c("PHOTOMETRIC=RGB", "ALPHA=YES"), datatype = "INT1U")
               }
           })
       }
-
   })
 #+end_src
+
 ** save those cropped as readable tifs
 #+begin_src R
       library(raster)
