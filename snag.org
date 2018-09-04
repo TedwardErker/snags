@@ -20,83 +20,6 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
-#+begin_example
-Loading required package: bit
-Attaching package bit
-package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
-creators: bit bitwhich
-coercion: as.logical as.integer as.bit as.bitwhich which
-operator: ! & | xor != ==
-querying: print length any all min max range sum summary
-bit access: length<- [ [<- [[ [[<-
-for more help type ?bit
-
-Attaching package: ‘bit’
-
-The following object is masked from ‘package:base’:
-
-    xor
-
-Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpQBt49B"
-
-- getOption("ffextension")=="ff"
-
-- getOption("ffdrop")==TRUE
-
-- getOption("fffinonexit")==TRUE
-
-- getOption("ffpagesize")==65536
-
-- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
-
-- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
-
-- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
-
-
-Attaching package: ‘ff’
-
-The following objects are masked from ‘package:bit’:
-
-    clone, clone.default, clone.list
-
-The following objects are masked from ‘package:raster’:
-
-    filename, is.factor, ncol<-, nrow<-
-
-The following objects are masked from ‘package:utils’:
-
-    write.csv, write.csv2
-
-The following objects are masked from ‘package:base’:
-
-    is.factor, is.ordered
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:raster’:
-
-    intersect, select, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-randomForest 4.6-14
-Type rfNews() to see new features/changes/bug fixes.
-
-Attaching package: ‘randomForest’
-
-The following object is masked from ‘package:dplyr’:
-
-    combine
-Loading required package: foreach
-Loading required package: iterators
-#+end_example
 
 * bits
 ** texture params
@@ -1361,31 +1284,18 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
   })
 #+end_src
 
-** save those cropped as readable tifs
-#+begin_src R
-      library(raster)
-      library(tiff)
-        image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}_masked_[0-9]+.tif$")
-
-  lapply(image.files, function(i) {
-      a <- brick(i)
-      out <- paste0(tools::file_path_sans_ext(i),"int.tif")
-      writeRaster(a, out, options = c("PHOTOMETRIC=RGB", "ALPHA=YES"), datatype = "INT1U", overwrite = T)
-  })
-
-#+end_src
-
-#+RESULTS:
-: Error in .local(.Object, ...) :
-
 ** add some additional features/layers
 
 #+begin_src R
 
-    tile.dirs <- list.dirs("data/NAIPImages/")[-1]
+  tile.dirs <- list.dirs("data/NAIPImages/")
+
+  tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
+
+    
 
     lapply(tile.dirs, function(tile.dir) {
-        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*_masked_[0-9]+.tif$"))
+        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
           add.features(tile.dir = tile.dir,
