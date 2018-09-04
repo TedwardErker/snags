@@ -1362,3 +1362,13 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 
 
 ** predict onto cropped images
+#+begin_src R
+
+  st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
+
+  names(st) <- str_replace(names(st), "masked_[0-9]+", "X")
+
+  # MAYBE I NEED TO CHANGE R RASTER's HANdling of memory.  processes seem to be getting killed...
+  pred.r <- raster::predict(st, mod)
+
+#+end_src
