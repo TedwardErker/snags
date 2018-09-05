@@ -974,7 +974,7 @@ df <- df %>% na.omit()
 #+RESULTS:
 
 #+begin_src R
-#mod_all <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+mod_all <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+end_src
 
 #+RESULTS:
