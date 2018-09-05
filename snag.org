@@ -1,7 +1,7 @@
 #+TITLE:Classify Snags
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
-#+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag:krusty* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
@@ -38,7 +38,7 @@ The following object is masked from ‘package:base’:
     xor
 
 Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpTa2ZfF"
+- getOption("fftempdir")=="/tmp/RtmpIhsXPZ"
 
 - getOption("ffextension")=="ff"
 
@@ -72,16 +72,6 @@ The following objects are masked from ‘package:utils’:
 The following objects are masked from ‘package:base’:
 
     is.factor, is.ordered
-randomForest 4.6-14
-Type rfNews() to see new features/changes/bug fixes.
-
-Attaching package: ‘randomForest’
-
-The following object is masked from ‘package:dplyr’:
-
-    combine
-Loading required package: foreach
-Loading required package: iterators
 #+end_example
 
 * bits
@@ -1408,7 +1398,7 @@ Warning messages:
 
 
 #+begin_src R
-    cores <- 2
+    cores <- 15
 
   tile.dirs <- list.dirs("data/NAIPImages/")
 
@@ -1417,8 +1407,9 @@ Warning messages:
     lapply(tile.dirs, function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
         lapply(tile.names, function(tile.name) {
-                                            #          cl <- makeCluster(cores)
-                                            #         registerDoParallel(cl)
+
+            cl <- makeCluster(cores)
+            registerDoParallel(cl)
 
             ## focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
             ## focal.fun <- c("mean","max","min")
@@ -1444,7 +1435,7 @@ Warning messages:
                                          stringsAsFactors = F)
 
             features <- foreach (i = 1:nrow(focal.param.df),
-                                 .packages = c("raster","stringr")) %do% {
+                                 .packages = c("raster","stringr")) %dopar% {
                                  #.export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')
                                      make.focal.features(focal.param.df[i,])
                                  }
@@ -1465,7 +1456,7 @@ Warning messages:
   names(st) <- str_replace(names(st), "masked_[0-9]+", "X")
 
   # MAYBE I NEED TO CHANGE R RASTER's HANdling of memory.  processes seem to be getting killed...
-rasterOptions(maxmemory = 1e+08)
+
   pred.r <- raster::predict(st, mod)
 
 #+end_src
