@@ -20,6 +20,69 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
+#+begin_example
+Loading required package: bit
+Attaching package bit
+package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
+creators: bit bitwhich
+coercion: as.logical as.integer as.bit as.bitwhich which
+operator: ! & | xor != ==
+querying: print length any all min max range sum summary
+bit access: length<- [ [<- [[ [[<-
+for more help type ?bit
+
+Attaching package: ‘bit’
+
+The following object is masked from ‘package:base’:
+
+    xor
+
+Attaching package ff
+- getOption("fftempdir")=="/tmp/RtmpTa2ZfF"
+
+- getOption("ffextension")=="ff"
+
+- getOption("ffdrop")==TRUE
+
+- getOption("fffinonexit")==TRUE
+
+- getOption("ffpagesize")==65536
+
+- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
+
+- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
+
+- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
+
+
+Attaching package: ‘ff’
+
+The following objects are masked from ‘package:bit’:
+
+    clone, clone.default, clone.list
+
+The following objects are masked from ‘package:raster’:
+
+    filename, is.factor, ncol<-, nrow<-
+
+The following objects are masked from ‘package:utils’:
+
+    write.csv, write.csv2
+
+The following objects are masked from ‘package:base’:
+
+    is.factor, is.ordered
+randomForest 4.6-14
+Type rfNews() to see new features/changes/bug fixes.
+
+Attaching package: ‘randomForest’
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+Loading required package: foreach
+Loading required package: iterators
+#+end_example
 
 * bits
 ** texture params
@@ -928,14 +991,15 @@ df <- df %>% na.omit()
 
 snag specific model to identify the features most important for
 distinguishing snags
-#+begin_src R
+#+begin_src R :eval no
 sdf <- df %>% mutate(Class = ifelse(Class == "snag", 1, 0))
 snag_mod <- randomForest(y = factor(sdf$Class), x= sdf[,1:(dim(sdf)[2]-1)])
+saveRDS(snag_mod, "data/training/snag_mod.rds")
 #+end_src
 
 #+RESULTS:
 
-#+begin_src R
+#+begin_src R :eval no
 top <- arrange(data.frame(importance(snag_mod), name = row.names(importance(snag_mod))), -MeanDecreaseGini) %>% head(80)
 saveRDS(top, "data/training/top.rds")
 top
@@ -943,98 +1007,102 @@ top
 
 #+RESULTS:
 #+begin_example
-   MeanDecreaseGini                                   name
-1         20.576953          X_blue_windowcircle.2_fun.max
-2         20.463792   X_ratio.nir_windowcircle.11_fun.mean
-3         17.780669        X_ndvi_windowcircle.11_fun.mean
-4         17.164351  X_ratio.green_windowcircle.11_fun.min
-5         16.842075          X_blue_windowcircle.1_fun.max
-6         14.738142 X_ratio.green_windowcircle.11_fun.mean
-7         14.494625                                  X_nir
-8         14.173392          X_nir_windowcircle.11_fun.min
-9         13.934091          X_nir_windowcircle.1_fun.mean
-10        13.745507         X_ndvi_windowcircle.11_fun.min
-11        13.713023           X_red_windowcircle.2_fun.max
-12        12.999989          X_ndvi_windowcircle.2_fun.min
-13        12.601786    X_ratio.nir_windowcircle.11_fun.min
-14        12.369112     X_ratio.nir_windowcircle.2_fun.min
-15        12.073209           X_red_windowcircle.4_fun.max
-16        11.764952   X_ratio.blue_windowcircle.4_fun.mean
-17        11.656790         X_blue_windowcircle.2_fun.mean
-18        11.371068        X_green_windowcircle.11_fun.max
-19        11.334841          X_blue_windowcircle.4_fun.max
-20        11.332903          X_nir_windowcircle.2_fun.mean
-21        11.017334         X_blue_windowcircle.1_fun.mean
-22        11.005480   X_ratio.red_windowcircle.11_fun.mean
-23        10.934592    X_ratio.blue_windowcircle.2_fun.min
-24        10.854504   X_ratio.green_windowcircle.8_fun.max
-25        10.738702           X_nir_windowcircle.8_fun.min
-26        10.601634           X_red_windowcircle.1_fun.max
-27        10.296175          X_nir_windowcircle.4_fun.mean
-28        10.290314    X_ratio.red_windowcircle.11_fun.max
-29        10.230920         X_blue_windowcircle.11_fun.max
-30         9.914854         X_green_windowcircle.4_fun.max
-31         9.881536           X_nir_windowcircle.2_fun.min
-32         9.764741          X_red_windowcircle.11_fun.max
-33         9.657807           X_nir_windowcircle.4_fun.min
-34         9.629003          X_blue_windowcircle.8_fun.max
-35         9.595975         X_green_windowcircle.8_fun.max
-36         9.541538   X_ratio.green_windowcircle.4_fun.max
-37         9.520271           X_nir_windowcircle.1_fun.min
-38         9.038568    X_ratio.blue_windowcircle.1_fun.min
-39         8.882311           X_red_windowcircle.8_fun.max
-40         8.763237   X_ratio.green_windowcircle.8_fun.min
-41         8.757329         X_ndvi_windowcircle.11_fun.max
-42         8.735981   X_ratio.blue_windowcircle.1_fun.mean
-43         8.649299     X_ratio.red_windowcircle.2_fun.max
-44         8.647543          X_ndvi_windowcircle.8_fun.min
-45         8.603943       X_green_windowcircle.11_fun.mean
-46         8.571075     X_ratio.nir_windowcircle.8_fun.min
-47         8.510407           X_nir_windowcircle.1_fun.max
-48         8.476365    X_ratio.nir_windowcircle.8_fun.mean
-49         8.432659                                 X_blue
-50         8.358185         X_green_windowcircle.2_fun.max
-51         8.314911  X_ratio.green_windowcircle.8_fun.mean
-52         8.146747         X_red_windowcircle.11_fun.mean
-53         8.139373          X_ndvi_windowcircle.1_fun.min
-54         8.089198   X_ratio.blue_windowcircle.2_fun.mean
-55         7.658501     X_ratio.nir_windowcircle.4_fun.max
-56         7.316448     X_ratio.nir_windowcircle.8_fun.max
-57         7.279511          X_ndvi_windowcircle.4_fun.max
-58         7.258029     X_ratio.nir_windowcircle.1_fun.min
-59         7.250730     X_ratio.red_windowcircle.1_fun.max
-60         6.964312    X_ratio.nir_windowcircle.11_fun.max
-61         6.959324          X_ndvi_windowcircle.8_fun.max
-62         6.865357  X_ratio.green_windowcircle.11_fun.max
-63         6.586108         X_nir_windowcircle.11_fun.mean
-64         6.543595          X_ndvi_windowcircle.4_fun.min
-65         6.370678          X_blue_windowcircle.2_fun.min
-66         6.345479     X_ratio.red_windowcircle.8_fun.max
-67         6.093094          X_blue_windowcircle.1_fun.min
-68         5.980256          X_red_windowcircle.11_fun.min
-69         5.886512    X_ratio.red_windowcircle.11_fun.min
-70         5.796078         X_blue_windowcircle.4_fun.mean
-71         5.760700     X_ratio.red_windowcircle.4_fun.max
-72         5.760119         X_ndvi_windowcircle.8_fun.mean
-73         5.716718                           X_ratio.blue
-74         5.619543          X_nir_windowcircle.8_fun.mean
-75         5.532712        X_green_windowcircle.8_fun.mean
-76         5.510046           X_nir_windowcircle.2_fun.max
-77         5.487057     X_ratio.nir_windowcircle.4_fun.min
-78         5.384078                                X_green
-79         5.273462         X_ndvi_windowcircle.2_fun.mean
-80         5.112863          X_red_windowcircle.2_fun.mean
+ 
+  MeanDecreaseGini                                   name
+1         19.532056        X_ndvi_windowcircle.11_fun.mean
+2         18.724423   X_ratio.nir_windowcircle.11_fun.mean
+3         16.874177          X_blue_windowcircle.2_fun.max
+4         16.867925          X_blue_windowcircle.1_fun.max
+5         16.572988                                  X_nir
+6         14.736314 X_ratio.green_windowcircle.11_fun.mean
+7         14.310098        X_green_windowcircle.11_fun.max
+8         14.044639          X_nir_windowcircle.1_fun.mean
+9         13.951742   X_ratio.green_windowcircle.8_fun.max
+10        13.883935  X_ratio.green_windowcircle.11_fun.min
+11        13.628141          X_ndvi_windowcircle.2_fun.min
+12        13.108170           X_red_windowcircle.2_fun.max
+13        12.989625          X_nir_windowcircle.2_fun.mean
+14        12.863117         X_ndvi_windowcircle.11_fun.min
+15        12.723418          X_blue_windowcircle.4_fun.max
+16        12.339056          X_nir_windowcircle.4_fun.mean
+17        12.113967     X_ratio.nir_windowcircle.2_fun.min
+18        11.642379         X_blue_windowcircle.2_fun.mean
+19        11.552433    X_ratio.nir_windowcircle.11_fun.min
+20        11.280171   X_ratio.green_windowcircle.8_fun.min
+21        11.232931           X_nir_windowcircle.1_fun.min
+22        11.124447    X_ratio.red_windowcircle.11_fun.max
+23        11.016089         X_green_windowcircle.4_fun.max
+24        10.901220          X_nir_windowcircle.11_fun.min
+25        10.773768     X_ratio.red_windowcircle.2_fun.max
+26        10.732872         X_blue_windowcircle.1_fun.mean
+27        10.649295           X_red_windowcircle.4_fun.max
+28        10.626277   X_ratio.green_windowcircle.4_fun.max
+29        10.605474   X_ratio.red_windowcircle.11_fun.mean
+30        10.396353          X_red_windowcircle.11_fun.max
+31        10.328338           X_nir_windowcircle.8_fun.min
+32         9.965778    X_ratio.blue_windowcircle.2_fun.min
+33         9.927077           X_nir_windowcircle.1_fun.max
+34         9.881179   X_ratio.blue_windowcircle.4_fun.mean
+35         9.499048     X_ratio.nir_windowcircle.8_fun.min
+36         9.441757         X_green_windowcircle.8_fun.max
+37         9.323190   X_ratio.blue_windowcircle.1_fun.mean
+38         9.205601         X_blue_windowcircle.11_fun.max
+39         9.142293           X_nir_windowcircle.2_fun.min
+40         9.133475          X_ndvi_windowcircle.8_fun.max
+41         8.947641           X_red_windowcircle.1_fun.max
+42         8.830900          X_blue_windowcircle.8_fun.max
+43         8.676748           X_nir_windowcircle.4_fun.min
+44         8.654559     X_ratio.nir_windowcircle.4_fun.max
+45         8.605447         X_blue_windowcircle.4_fun.mean
+46         8.350714   X_ratio.blue_windowcircle.2_fun.mean
+47         8.335543          X_ndvi_windowcircle.8_fun.min
+48         8.202849         X_ndvi_windowcircle.8_fun.mean
+49         8.174680         X_ndvi_windowcircle.11_fun.max
+50         8.110216           X_red_windowcircle.8_fun.max
+51         8.096453       X_green_windowcircle.11_fun.mean
+52         8.053992         X_red_windowcircle.11_fun.mean
+53         8.032073         X_green_windowcircle.2_fun.max
+54         7.990580     X_ratio.red_windowcircle.4_fun.max
+55         7.888336    X_ratio.blue_windowcircle.1_fun.min
+56         7.749072    X_ratio.nir_windowcircle.8_fun.mean
+57         7.456040  X_ratio.green_windowcircle.8_fun.mean
+58         7.401041     X_ratio.nir_windowcircle.8_fun.max
+59         7.366527    X_ratio.nir_windowcircle.11_fun.max
+60         7.253354          X_ndvi_windowcircle.4_fun.max
+61         7.056013          X_ndvi_windowcircle.4_fun.min
+62         6.959115     X_ratio.nir_windowcircle.1_fun.min
+63         6.911716                                 X_blue
+64         6.448223        X_green_windowcircle.8_fun.mean
+65         6.186867          X_ndvi_windowcircle.1_fun.min
+66         6.077073     X_ratio.red_windowcircle.1_fun.max
+67         5.973074          X_red_windowcircle.11_fun.min
+68         5.918807  X_ratio.green_windowcircle.11_fun.max
+69         5.830403     X_ratio.red_windowcircle.8_fun.max
+70         5.745343          X_blue_windowcircle.2_fun.min
+71         5.681560        X_green_windowcircle.4_fun.mean
+72         5.610099                                X_green
+73         5.447954          X_nir_windowcircle.8_fun.mean
+74         5.403708         X_nir_windowcircle.11_fun.mean
+75         5.369759    X_ratio.blue_windowcircle.2_fun.max
+76         5.340857          X_blue_windowcircle.1_fun.min
+77         5.329139                           X_ratio.blue
+78         5.277538     X_ratio.nir_windowcircle.4_fun.min
+79         5.130827    X_ratio.blue_windowcircle.4_fun.min
+80         5.115028         X_green_windowcircle.1_fun.max
 #+end_example
 
 
 
 build model with top variables
 #+begin_src R
-top <- readRDS("data/training/top.rds")
+top <- readRDS("./data/training/top.rds")
 mod <- randomForest(y = factor(df$Class), x= df[,c(as.character(top$name), "X_ratio.red","X_blue", "X_red")])
 #+end_src
 
 #+RESULTS:
+: Error in readRDS("data/training/top.rds") : error reading from connection
+: Error in `[.data.frame`(df, , c(as.character(top$name), "X_ratio.red",  : 
+:   object 'top' not found
 
 
 * predict onto raster
@@ -1217,6 +1285,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
     library(maptools)
     library(dplyr)
     library(raster)
+library(stringr)
     d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
     coordinates(d) <- ~long + lat
     proj4string(d) <- CRS("+init=epsg:4326")
@@ -1235,9 +1304,36 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
-: Warning messages:
-: 1: Setting row names on a tibble is deprecated. 
-: 2: Setting row names on a tibble is deprecated.
+#+begin_example
+rgeos version: 0.3-26, (SVN revision 560)
+ GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
+ Linking to sp version: 1.2-7 
+ Polygon checking: TRUE
+Checking rgeos availability: TRUE
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:rgeos’:
+
+    intersect, setdiff, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Attaching package: ‘raster’
+
+The following object is masked from ‘package:dplyr’:
+
+    select
+Warning messages:
+1: Setting row names on a tibble is deprecated. 
+2: Setting row names on a tibble is deprecated.
+#+end_example
 ** read images and crop to 2km
 #+begin_src R
 
@@ -1294,7 +1390,7 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
 
-    
+
 
     lapply(tile.dirs, function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
@@ -1369,6 +1465,10 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
   names(st) <- str_replace(names(st), "masked_[0-9]+", "X")
 
   # MAYBE I NEED TO CHANGE R RASTER's HANdling of memory.  processes seem to be getting killed...
+rasterOptions(maxmemory = 1e+08)
   pred.r <- raster::predict(st, mod)
 
 #+end_src
+
+#+RESULTS:
+: Error in inherits(model, "DistModel") : object 'mod' not found
