@@ -1473,7 +1473,7 @@ Warning messages:
 
   # MAYBE I NEED TO CHANGE R RASTER's HANdling of memory.  processes seem to be getting killed...
 
-  pred.r <- raster::predict(st, mod)
+  pred.r <- raster::predict(st, mod, filename = "data/NAIPImages//Black River SF 2013/m_4409035_se_15_1_20130813/predicted.tif", overwrite = T, datatype = "INT1U")
 
 #+end_src
 
