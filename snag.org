@@ -999,86 +999,86 @@ top
 #+begin_example
  
   MeanDecreaseGini                                   name
-1         19.532056        X_ndvi_windowcircle.11_fun.mean
-2         18.724423   X_ratio.nir_windowcircle.11_fun.mean
-3         16.874177          X_blue_windowcircle.2_fun.max
-4         16.867925          X_blue_windowcircle.1_fun.max
-5         16.572988                                  X_nir
-6         14.736314 X_ratio.green_windowcircle.11_fun.mean
-7         14.310098        X_green_windowcircle.11_fun.max
-8         14.044639          X_nir_windowcircle.1_fun.mean
-9         13.951742   X_ratio.green_windowcircle.8_fun.max
-10        13.883935  X_ratio.green_windowcircle.11_fun.min
-11        13.628141          X_ndvi_windowcircle.2_fun.min
-12        13.108170           X_red_windowcircle.2_fun.max
-13        12.989625          X_nir_windowcircle.2_fun.mean
-14        12.863117         X_ndvi_windowcircle.11_fun.min
-15        12.723418          X_blue_windowcircle.4_fun.max
-16        12.339056          X_nir_windowcircle.4_fun.mean
-17        12.113967     X_ratio.nir_windowcircle.2_fun.min
-18        11.642379         X_blue_windowcircle.2_fun.mean
-19        11.552433    X_ratio.nir_windowcircle.11_fun.min
-20        11.280171   X_ratio.green_windowcircle.8_fun.min
-21        11.232931           X_nir_windowcircle.1_fun.min
-22        11.124447    X_ratio.red_windowcircle.11_fun.max
-23        11.016089         X_green_windowcircle.4_fun.max
-24        10.901220          X_nir_windowcircle.11_fun.min
-25        10.773768     X_ratio.red_windowcircle.2_fun.max
-26        10.732872         X_blue_windowcircle.1_fun.mean
-27        10.649295           X_red_windowcircle.4_fun.max
-28        10.626277   X_ratio.green_windowcircle.4_fun.max
-29        10.605474   X_ratio.red_windowcircle.11_fun.mean
-30        10.396353          X_red_windowcircle.11_fun.max
-31        10.328338           X_nir_windowcircle.8_fun.min
-32         9.965778    X_ratio.blue_windowcircle.2_fun.min
-33         9.927077           X_nir_windowcircle.1_fun.max
-34         9.881179   X_ratio.blue_windowcircle.4_fun.mean
-35         9.499048     X_ratio.nir_windowcircle.8_fun.min
-36         9.441757         X_green_windowcircle.8_fun.max
-37         9.323190   X_ratio.blue_windowcircle.1_fun.mean
-38         9.205601         X_blue_windowcircle.11_fun.max
-39         9.142293           X_nir_windowcircle.2_fun.min
-40         9.133475          X_ndvi_windowcircle.8_fun.max
-41         8.947641           X_red_windowcircle.1_fun.max
-42         8.830900          X_blue_windowcircle.8_fun.max
-43         8.676748           X_nir_windowcircle.4_fun.min
-44         8.654559     X_ratio.nir_windowcircle.4_fun.max
-45         8.605447         X_blue_windowcircle.4_fun.mean
-46         8.350714   X_ratio.blue_windowcircle.2_fun.mean
-47         8.335543          X_ndvi_windowcircle.8_fun.min
-48         8.202849         X_ndvi_windowcircle.8_fun.mean
-49         8.174680         X_ndvi_windowcircle.11_fun.max
-50         8.110216           X_red_windowcircle.8_fun.max
-51         8.096453       X_green_windowcircle.11_fun.mean
-52         8.053992         X_red_windowcircle.11_fun.mean
-53         8.032073         X_green_windowcircle.2_fun.max
-54         7.990580     X_ratio.red_windowcircle.4_fun.max
-55         7.888336    X_ratio.blue_windowcircle.1_fun.min
-56         7.749072    X_ratio.nir_windowcircle.8_fun.mean
-57         7.456040  X_ratio.green_windowcircle.8_fun.mean
-58         7.401041     X_ratio.nir_windowcircle.8_fun.max
-59         7.366527    X_ratio.nir_windowcircle.11_fun.max
-60         7.253354          X_ndvi_windowcircle.4_fun.max
-61         7.056013          X_ndvi_windowcircle.4_fun.min
-62         6.959115     X_ratio.nir_windowcircle.1_fun.min
-63         6.911716                                 X_blue
-64         6.448223        X_green_windowcircle.8_fun.mean
-65         6.186867          X_ndvi_windowcircle.1_fun.min
-66         6.077073     X_ratio.red_windowcircle.1_fun.max
-67         5.973074          X_red_windowcircle.11_fun.min
-68         5.918807  X_ratio.green_windowcircle.11_fun.max
-69         5.830403     X_ratio.red_windowcircle.8_fun.max
-70         5.745343          X_blue_windowcircle.2_fun.min
-71         5.681560        X_green_windowcircle.4_fun.mean
-72         5.610099                                X_green
-73         5.447954          X_nir_windowcircle.8_fun.mean
-74         5.403708         X_nir_windowcircle.11_fun.mean
-75         5.369759    X_ratio.blue_windowcircle.2_fun.max
-76         5.340857          X_blue_windowcircle.1_fun.min
-77         5.329139                           X_ratio.blue
-78         5.277538     X_ratio.nir_windowcircle.4_fun.min
-79         5.130827    X_ratio.blue_windowcircle.4_fun.min
-80         5.115028         X_green_windowcircle.1_fun.max
+1         19.347103          X_blue_windowcircle.2_fun.max
+2         19.154093   X_ratio.nir_windowcircle.11_fun.mean
+3         18.017903          X_blue_windowcircle.1_fun.max
+4         17.993757        X_ndvi_windowcircle.11_fun.mean
+5         17.655704          X_nir_windowcircle.1_fun.mean
+6         15.658670         X_ndvi_windowcircle.11_fun.min
+7         14.309253 X_ratio.green_windowcircle.11_fun.mean
+8         14.283345           X_red_windowcircle.2_fun.max
+9         13.844786                                  X_nir
+10        13.506021          X_blue_windowcircle.4_fun.max
+11        13.020052          X_ndvi_windowcircle.2_fun.min
+12        12.996819         X_ndvi_windowcircle.11_fun.max
+13        12.877130  X_ratio.green_windowcircle.11_fun.min
+14        12.400715    X_ratio.nir_windowcircle.11_fun.min
+15        12.307431   X_ratio.green_windowcircle.8_fun.max
+16        12.302915           X_nir_windowcircle.1_fun.min
+17        12.145734         X_green_windowcircle.4_fun.max
+18        12.076804     X_ratio.nir_windowcircle.2_fun.min
+19        11.801562        X_green_windowcircle.11_fun.max
+20        11.628065         X_blue_windowcircle.2_fun.mean
+21        11.456618          X_nir_windowcircle.11_fun.min
+22        11.396307          X_nir_windowcircle.2_fun.mean
+23        11.379518           X_red_windowcircle.4_fun.max
+24        10.537947    X_ratio.blue_windowcircle.2_fun.min
+25        10.448084         X_blue_windowcircle.1_fun.mean
+26        10.311652           X_nir_windowcircle.2_fun.min
+27        10.153252          X_blue_windowcircle.8_fun.max
+28         9.915345           X_nir_windowcircle.8_fun.min
+29         9.910384   X_ratio.green_windowcircle.8_fun.min
+30         9.898697   X_ratio.blue_windowcircle.4_fun.mean
+31         9.828935           X_red_windowcircle.1_fun.max
+32         9.719146     X_ratio.red_windowcircle.2_fun.max
+33         9.617798   X_ratio.red_windowcircle.11_fun.mean
+34         9.600173         X_green_windowcircle.8_fun.max
+35         9.113229           X_nir_windowcircle.1_fun.max
+36         9.093242          X_nir_windowcircle.4_fun.mean
+37         9.050983   X_ratio.green_windowcircle.4_fun.max
+38         8.888027    X_ratio.red_windowcircle.11_fun.max
+39         8.811288          X_ndvi_windowcircle.8_fun.max
+40         8.802689     X_ratio.nir_windowcircle.8_fun.min
+41         8.723483         X_red_windowcircle.11_fun.mean
+42         8.679613         X_blue_windowcircle.11_fun.max
+43         8.613271          X_ndvi_windowcircle.4_fun.max
+44         8.351286         X_green_windowcircle.2_fun.max
+45         8.331988         X_blue_windowcircle.4_fun.mean
+46         8.325599          X_ndvi_windowcircle.8_fun.min
+47         8.305810          X_red_windowcircle.11_fun.max
+48         8.254720    X_ratio.blue_windowcircle.1_fun.min
+49         8.180472  X_ratio.green_windowcircle.8_fun.mean
+50         8.035357           X_nir_windowcircle.4_fun.min
+51         7.996406     X_ratio.nir_windowcircle.4_fun.max
+52         7.837828     X_ratio.red_windowcircle.8_fun.max
+53         7.833854                                 X_blue
+54         7.770387       X_green_windowcircle.11_fun.mean
+55         7.746537  X_ratio.green_windowcircle.11_fun.max
+56         7.723523         X_ndvi_windowcircle.8_fun.mean
+57         7.654671           X_red_windowcircle.8_fun.max
+58         7.598198    X_ratio.nir_windowcircle.8_fun.mean
+59         7.281618     X_ratio.nir_windowcircle.1_fun.min
+60         7.244368          X_ndvi_windowcircle.1_fun.min
+61         7.203821    X_ratio.nir_windowcircle.11_fun.max
+62         7.049254     X_ratio.nir_windowcircle.8_fun.max
+63         6.961247        X_green_windowcircle.8_fun.mean
+64         6.853885   X_ratio.blue_windowcircle.1_fun.mean
+65         6.764279   X_ratio.blue_windowcircle.2_fun.mean
+66         6.531185           X_nir_windowcircle.2_fun.max
+67         6.469607    X_ratio.red_windowcircle.11_fun.min
+68         6.428986          X_blue_windowcircle.1_fun.min
+69         6.249022         X_green_windowcircle.1_fun.max
+70         6.162802     X_ratio.red_windowcircle.1_fun.max
+71         5.861241          X_red_windowcircle.11_fun.min
+72         5.858497                           X_ratio.blue
+73         5.768380     X_ratio.red_windowcircle.4_fun.max
+74         5.621408          X_ndvi_windowcircle.4_fun.min
+75         5.568396     X_ratio.nir_windowcircle.4_fun.min
+76         5.353984         X_nir_windowcircle.11_fun.mean
+77         5.348694          X_nir_windowcircle.8_fun.mean
+78         5.243699          X_red_windowcircle.1_fun.mean
+79         5.216755    X_ratio.blue_windowcircle.1_fun.max
+80         5.178533          X_blue_windowcircle.2_fun.min
 #+end_example
 
 
@@ -1086,7 +1086,7 @@ top
 build model with top variables
 #+begin_src R
 top <- readRDS("./data/training/top.rds")
-mod <- randomForest(y = factor(df$Class), x= df[,c(as.character(top$name), "X_ratio.red","X_blue", "X_red")])
+mod <- randomForest(y = factor(df$Class), x= df[,c(as.character(top$name), "X_ratio.red","X_green", "X_red")])
 #+end_src
 
 #+RESULTS:
@@ -1398,7 +1398,7 @@ Warning messages:
 
 
 #+begin_src R
-    cores <- 15
+    cores <- 4
 
   tile.dirs <- list.dirs("data/NAIPImages/")
 
