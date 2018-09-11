@@ -1414,7 +1414,7 @@ Warning messages:
 
 
 #+begin_src R
-    cores <- 10
+    cores <- 20
 
   tile.dirs <- list.dirs("data/NAIPImages/")
 
@@ -1451,8 +1451,9 @@ Warning messages:
                                          stringsAsFactors = F)
 
             features <- foreach (i = 1:nrow(focal.param.df),
-                                 .packages = c("raster","stringr")) %dopar% {
-                                 #.export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')
+                                 .packages = c("raster","stringr"),
+                                 .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %dopar% {
+
                                      make.focal.features(focal.param.df[i,])
                                  }
         })
@@ -1460,8 +1461,8 @@ Warning messages:
 #+end_src
 
 #+RESULTS:
-: Error in stri_match_first_regex(string, pattern, opts_regex = opts(pattern)) : 
-:   object 'top' not found
+: Error in { : 
+:   task 1 failed - "could not find function "make.focal.features""
 
 
 ** predict onto cropped images
