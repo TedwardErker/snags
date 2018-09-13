@@ -1504,7 +1504,7 @@ Warning messages:
   extracted.values <- mat[ext_ID$cell,]
 
   df <- data.frame(extracted.values)
-  colnames(df) <- paste0("X",str_match(names(train.stack), "train(.*)")[,2])
+  colnames(df) <- names(train.stack)
 
   df$Class <- factor(ext_ID$Class)
 #+end_src
@@ -1512,23 +1512,28 @@ Warning messages:
 #+RESULTS:
 
 #+begin_src R
-saveRDS(df, "data/training/model_building_df.rds")
+saveRDS(df, "data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705_model_building_df.rds")
 #+end_src
+
+#+RESULTS:
 
 ** Build model
 #+begin_src R
-
+#df <- readRDS("data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705_model_building_df.rds")
+df <- df %>% na.omit()
+mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+end_src
 ** predict onto cropped images
 #+begin_src R
 
   st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
-  names(st) <- str_replace(names(st), "masked_[0-9]+", "X")
+  names(st) <- str_replace(names(st), "masked_[0-9]+_", "masked_1_")
 
   pred.r <- raster::predict(st, mod, filename = "data/NAIPImages//Black River SF 2013/m_4409035_se_15_1_20130813/predicted.tif", overwrite = T, datatype = "INT1U")
 
 #+end_src
 
 #+RESULTS:
-: Error in inherits(model, "DistModel") : object 'mod' not found
+: Error in predict.randomForest(model, blockvals, ...) : 
+:   variables in the training data missing in newdata
