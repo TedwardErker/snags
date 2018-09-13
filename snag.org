@@ -1533,7 +1533,3 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
   pred.r <- raster::predict(st, mod, filename = "data/NAIPImages//Black River SF 2013/m_4409035_se_15_1_20130813/predicted.tif", overwrite = T, datatype = "INT1U")
 
 #+end_src
-
-#+RESULTS:
-: Error in predict.randomForest(model, blockvals, ...) : 
-:   variables in the training data missing in newdata
