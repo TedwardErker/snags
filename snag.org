@@ -1478,32 +1478,23 @@ Warning messages:
 #+RESULTS:
 
 #+begin_src R
-    snag.cells <- which(getValues(snag == 255))
-    snag.df <- data.frame(cell = snag.cells, Class = "snag")
-
-    liveveg.cells <- sample(which(getValues(liveveg == 255)),20000)
-    liveveg.df <- data.frame(cell = liveveg.cells, Class = "liveveg")
-
-    livetree.cells <- sample(which(getValues(livetree == 255)),20000)
-    livetree.df <- data.frame(cell = livetree.cells, Class = "livetree")
-
-    other.cells <- sample(which(getValues(other == 255)),17000)
-    other.df <- data.frame(cell = other.cells, Class = "other")
-
-  ext_ID <- do.call("bind", list(snag.df, liveveg.df, livetree.df, other.df))
+  ext_ID <- do.call("bind", train.20130813.imgs)
 #+end_src
 
 #+RESULTS:
 
 #+begin_src R :eval yes
 
-  mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename="data/image/train/trainstack.ffdata")
+  train.stack <- stack(list.files("data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705", full.names = T, pattern = "masked_[0-9]+_.*.tif$"))
 
-  for(i in 1:nlayers(train.stack)){
-      mat[,i] <- train.stack[[i]][]
-  }
 
-  save(mat,file="data/image/train/train_stack_mat.RData")
+    mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename="data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705.ffdata")
+
+    for(i in 1:nlayers(train.stack)){
+        mat[,i] <- train.stack[[i]][]
+    }
+
+    save(mat,file="data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705_train.RData")
 
 #+end_src
 
