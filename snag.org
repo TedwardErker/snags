@@ -1525,11 +1525,19 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+end_src
 ** predict onto cropped images
 #+begin_src R
+    cores <- length(tile.dirs)
+  
+  cl <- makeCluster(cores)
+  registerDoParallel(cl)
 
-  st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
+      features <- foreach (tile.dir = tile.dirs,
+                           .packages = c("raster","stringr")) %dopar% {
 
-  names(st) <- str_replace(names(st), "masked_[0-9]+_", "masked_1_")
+                               st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
-  pred.r <- raster::predict(st, mod, filename = "data/NAIPImages//Black River SF 2013/m_4409035_se_15_1_20130813/predicted.tif", overwrite = T, datatype = "INT1U")
+                               names(st) <- str_replace(names(st), "masked_[0-9]+_", "masked_1_")
 
+                               pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "predicted.tif", overwrite = T, datatype = "INT1U"))
+
+                           }
 #+end_src
