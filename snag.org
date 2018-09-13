@@ -1531,7 +1531,7 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
   registerDoParallel(cl)
 
       features <- foreach (tile.dir = tile.dirs,
-                           .packages = c("raster","stringr")) %dopar% {
+                           .packages = c("raster","stringr","randomForest")) %dopar% {
 
                                st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
@@ -1541,3 +1541,7 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
                            }
 #+end_src
+
+#+RESULTS:
+: Error in { : 
+:   task 1 failed - "no applicable method for 'predict' applied to an object of class "randomForest""
