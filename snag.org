@@ -1460,15 +1460,19 @@ Warning messages:
 #+end_src
 ** training data
 #+begin_src R
-  tile.dirs <- list.dirs("data/NAIPImages/")
+    tile.dirs <- list.dirs("data/NAIPImages/")
 
-  tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
+    tile.dirs <- tile.dirs[grepl(".*20130813$", tile.dirs)]
 
-snag <- raster("data/NAIPImages/Black River training/snags.png")
-other <- raster("data/training/other.png")
-livetree <- raster("data/training/livetree.png")
-liveveg <- raster("data/training/liveveg.png")
+    train.20130813.imgs <- list.files("data/NAIPImages/", pattern = "m_4409052_nw_15_(liveveg|livetrees|other|snag)_masked.tif", recursive = T, full.names = T)
 
+    train.20130813.imgs <- lapply(train.20130813.imgs, raster)
+
+        train.20130813.imgs <- lapply(train.20130813.imgs, function(r) {
+            cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+            cells <- which(getValues(r > 0))
+            df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+  })
 #+end_src
 
 #+RESULTS:
