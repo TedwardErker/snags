@@ -1543,5 +1543,3 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+end_src
 
 #+RESULTS:
-: Error in { : 
-:   task 1 failed - "no applicable method for 'predict' applied to an object of class "randomForest""
