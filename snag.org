@@ -1537,7 +1537,7 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
                                names(st) <- str_replace(names(st), "masked_[0-9]+_", "masked_1_")
 
-                               pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "/predicted.tif", overwrite = T, datatype = "INT1U"))
+                               pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "/predicted.tif"), overwrite = T, datatype = "INT1U")
 
                            }
 #+end_src
