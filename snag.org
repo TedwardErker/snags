@@ -7,6 +7,13 @@
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
 #+OPTIONS: toc:t h:5
 ------------
+
+* hours
+| in                     | out | hours |   |   |
+|------------------------+-----+-------+---+---|
+| [2018-09-20 Thu 10:30] |     |       |   |   |
+|                        |     |       |   |   |
+
 * libraries
 #+begin_src R
 library(raster)
@@ -1109,7 +1116,6 @@ mod <- randomForest(y = factor(df$Class), x= df[,c(as.character(top$name))])
 
 saveRDS(mod, "data/training/training_mod100.rds")
 #+end_src
-
 
 * predict onto raster
 #+begin_src R
