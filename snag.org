@@ -12,7 +12,7 @@
 | in                     | out                    | hours |   |   |
 |------------------------+------------------------+-------+---+---|
 | [2018-09-20 Thu 10:30] | [2018-09-20 Thu 11:20] |       |   |   |
-|                        |                        |       |   |   |
+| [2018-09-21 Fri 10:00] |                        |       |   |   |
 
 * libraries
 #+begin_src R
@@ -1316,40 +1316,13 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
-#+begin_example
-rgeos version: 0.3-26, (SVN revision 560)
- GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
- Linking to sp version: 1.2-7 
- Polygon checking: TRUE
-Checking rgeos availability: TRUE
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:rgeos’:
-
-    intersect, setdiff, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Attaching package: ‘raster’
-
-The following object is masked from ‘package:dplyr’:
-
-    select
-Warning messages:
-1: Setting row names on a tibble is deprecated. 
-2: Setting row names on a tibble is deprecated.
-#+end_example
+: Warning messages:
+: 1: Setting row names on a tibble is deprecated. 
+: 2: Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
 #+begin_src R
 
-  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}.tif$")[1:5]
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}.tif$")[6:27]
 
   images <- lapply(image.files, function(image.file) stack(image.file))
 
@@ -1397,7 +1370,7 @@ Warning messages:
 
 #+begin_src R
 
-  tile.dirs <- list.dirs("data/NAIPImages/")
+  tile.dirs <- list.dirs("data/NAIPImages/")[6:27]
 
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
 
@@ -1421,7 +1394,7 @@ Warning messages:
 #+begin_src R
     cores <- 20
 
-  tile.dirs <- list.dirs("data/NAIPImages/")
+  tile.dirs <- list.dirs("data/NAIPImages/")[6:27]
 
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
 
