@@ -13316,41 +13316,50 @@ There were 50 or more warnings (use warnings() to see the first 50)
 
 ** training data
 #+begin_src R
-    tile.dirs <- list.dirs("data/NAIPImages/")
+  date <- "20130705"
+  # for date in dates for which we have training data....
 
-    tile.dirs <- tile.dirs[grepl(".*20130813$", tile.dirs)]
+      tile.dirs <- list.dirs("data/NAIPImages/")
 
-    train.20130813.imgs <- list.files("data/NAIPImages/", pattern = "m_4409052_nw_15_(liveveg|livetrees|other|snag)_masked.tif", recursive = T, full.names = T)
+      tile.dirs <- tile.dirs[grepl(paste0(".*",date), tile.dirs)]
 
-    train.20130813.imgs <- lapply(train.20130813.imgs, raster)
+      train.date.imgs <- list.files("data/NAIPImages/", pattern = paste0(".*",date,"_(liveveg|livetrees|other|snag)_masked.tif"), recursive = T, full.names = T)
 
-        train.20130813.imgs <- lapply(train.20130813.imgs, function(r) {
-            cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
-            cells <- which(getValues(r > 0))
-            df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
-  })
+      train.date.imgs <- lapply(train.date.imgs, raster)
+
+          train.date.imgs <- lapply(train.date.imgs, function(r) {
+              cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+              cells <- which(getValues(r > 0))
+              df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+    })
 #+end_src
 
 #+RESULTS:
 
 #+begin_src R
-  ext_ID <- do.call("bind", train.20130813.imgs)
+  ext_ID <- do.call("bind", train.date.imgs)
 #+end_src
 
 #+RESULTS:
 
 #+begin_src R :eval yes
 
-  train.stack <- stack(list.files("data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705", full.names = T, pattern = "masked_[0-9]+_.*.tif$"))
+  tile <- str_extract(train.date.imgs[1], ".*[0-9]{8}")
+
+    f <- list.files(tile, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
 
 
-    mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename="data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705.ffdata")
+    train.stack <- stack(f)
 
-    for(i in 1:nlayers(train.stack)){
-        mat[,i] <- train.stack[[i]][]
-    }
+  fn <- paste0(tile, ".ffdata")
 
-    save(mat,file="data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705_train.RData")
+  mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
+
+        for(i in 1:nlayers(train.stack)){
+            mat[,i] <- train.stack[[i]][]
+        }
+
+        save(mat,file=paste0(tile, "_train.RData"))
 
 #+end_src
 
@@ -13368,14 +13377,13 @@ There were 50 or more warnings (use warnings() to see the first 50)
 #+RESULTS:
 
 #+begin_src R
-saveRDS(df, "data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705_model_building_df.rds")
+saveRDS(df, paste0(tile, "_model_building_df.rds"))
 #+end_src
 
 #+RESULTS:
 
 ** Build model
 #+begin_src R
-#df <- readRDS("data/NAIPImages/Black River SF 2013/m_4409052_nw_15_1_20130705_model_building_df.rds")
 df <- df %>% na.omit()
 mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+end_src
