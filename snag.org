@@ -13,6 +13,7 @@
 |------------------------+------------------------+-------+---+---|
 | [2018-09-20 Thu 10:30] | [2018-09-20 Thu 11:20] |  .875 |   |   |
 | [2018-09-21 Fri 10:00] | [2018-09-21 Fri 11:00] |     1 |   |   |
+| [2018-09-25 Tue 9:30]  | [2018-09-25 Tue ]      |       |   |   |
 
 * libraries
 #+begin_src R
@@ -1370,7 +1371,8 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 
 #+begin_src R
 
-  tile.dirs <- list.dirs("data/NAIPImages/")[6:27]
+  tile.dirs <- list.dirs("data/NAIPImages/")
+
 
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
 
@@ -1394,7 +1396,7 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+begin_src R
     cores <- 20
 
-  tile.dirs <- list.dirs("data/NAIPImages/")[6:27]
+  tile.dirs <- list.dirs("data/NAIPImages/")[23:32]
 
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
 
