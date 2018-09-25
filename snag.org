@@ -13389,8 +13389,8 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 #+end_src
 ** predict onto cropped images
 #+begin_src R
-    cores <- length(tile.dirs)
-  
+  cores <- length(tile.dirs)
+
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
