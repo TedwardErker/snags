@@ -13324,45 +13324,50 @@ There were 50 or more warnings (use warnings() to see the first 50)
 
       tile.dirs <- tile.dirs[grepl(paste0(".*",date), tile.dirs)]
 
-      train.date.imgs <- list.files("data/NAIPImages/", pattern = paste0(".*",date,"_(liveveg|livetrees|other|snag)_masked.tif"), recursive = T, full.names = T)
+      lapply(tile.dirs, function(tile.dir) {
 
-      train.date.imgs <- lapply(train.date.imgs, raster)
+          train.date.imgs <- paste0(tile.dir, "_",c("liveveg","livetrees","other","snag"),"_masked.tif")
+          train.date.imgs <- lapply(train.date.imgs, raster)
 
-      train.date.imgs <- lapply(train.date.imgs, function(r) {
-          cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
-          cells <- which(getValues(r > 0))
-          df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+          train.date.imgs <- lapply(train.date.imgs, function(r) {
+              cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+              cells <- which(getValues(r > 0))
+              df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+          })
+
+          ext_ID <- do.call("bind", train.date.imgs)
+
+          f <- list.files(tile.dir, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+
+          train.stack <- stack(f)
+
+          fn <- paste0(tile.dir, ".ffdata")
+
+          mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
+
+          for(i in 1:nlayers(train.stack)){
+              mat[,i] <- train.stack[[i]][]
+          }
+
+          save(mat,file=paste0(tile, "_train.RData"))
+        
+          extracted.values <- mat[ext_ID$cell,]
+
+          df <- data.frame(extracted.values)
+          colnames(df) <- names(train.stack)
+
+          df$Class <- factor(ext_ID$Class)
+
+          saveRDS(df, paste0(tile, "_model_building_df.rds"))
+
       })
 
-      ext_ID <- do.call("bind", train.date.imgs)
+      dfs <- list.files(   )
 
-
-      tile <- str_extract(train.date.imgs[1], ".*[0-9]{8}")
-
-      f <- list.files(tile, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
-
-
-      train.stack <- stack(f)
-
-      fn <- paste0(tile, ".ffdata")
-
-      mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
-
-      for(i in 1:nlayers(train.stack)){
-          mat[,i] <- train.stack[[i]][]
-      }
-
-      save(mat,file=paste0(tile, "_train.RData"))
-
-      extracted.values <- mat[ext_ID$cell,]
-
-      df <- data.frame(extracted.values)
-      colnames(df) <- names(train.stack)
-
-      df$Class <- factor(ext_ID$Class)
-
-      saveRDS(df, paste0(tile, "_model_building_df.rds"))
-
+      dfs <- lapply(dfs, readRDS)
+    
+      df <- do.call("rbind", dfs)
+        
       df <- df %>% na.omit()
       mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
