@@ -13361,7 +13361,7 @@ There were 50 or more warnings (use warnings() to see the first 50)
           saveRDS(df, paste0(tile, "_model_building_df.rds"))
 
       })
-.......
+
       dfs <- list.files("data/NAIPImages", pattern = paste0(".*",date,"_model_building_df.rds"))
 
       dfs <- lapply(dfs, readRDS)
