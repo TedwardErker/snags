@@ -13314,11 +13314,12 @@ values      : -Inf, 138  (min, max)
 There were 50 or more warnings (use warnings() to see the first 50)
 #+end_example
 
-** training data
+** training data, Build model, and predict onto cropped images
 #+begin_src R
-  date <- "20130705"
-  # for date in dates for which we have training data....
+  dates <- c("20130705","20130813")
 
+                                          # for date in dates for which we have training data....
+  lapply(dates, function(date) {
       tile.dirs <- list.dirs("data/NAIPImages/")
 
       tile.dirs <- tile.dirs[grepl(paste0(".*",date), tile.dirs)]
@@ -13327,72 +13328,49 @@ There were 50 or more warnings (use warnings() to see the first 50)
 
       train.date.imgs <- lapply(train.date.imgs, raster)
 
-          train.date.imgs <- lapply(train.date.imgs, function(r) {
-              cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
-              cells <- which(getValues(r > 0))
-              df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
-    })
-#+end_src
+      train.date.imgs <- lapply(train.date.imgs, function(r) {
+          cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+          cells <- which(getValues(r > 0))
+          df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+      })
 
-#+RESULTS:
-
-#+begin_src R
-  ext_ID <- do.call("bind", train.date.imgs)
-#+end_src
-
-#+RESULTS:
-
-#+begin_src R :eval yes
-
-  tile <- str_extract(train.date.imgs[1], ".*[0-9]{8}")
-
-    f <- list.files(tile, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+      ext_ID <- do.call("bind", train.date.imgs)
 
 
-    train.stack <- stack(f)
+      tile <- str_extract(train.date.imgs[1], ".*[0-9]{8}")
 
-  fn <- paste0(tile, ".ffdata")
+      f <- list.files(tile, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
 
-  mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
 
-        for(i in 1:nlayers(train.stack)){
-            mat[,i] <- train.stack[[i]][]
-        }
+      train.stack <- stack(f)
 
-        save(mat,file=paste0(tile, "_train.RData"))
+      fn <- paste0(tile, ".ffdata")
 
-#+end_src
+      mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
 
-#+RESULTS:
+      for(i in 1:nlayers(train.stack)){
+          mat[,i] <- train.stack[[i]][]
+      }
 
-#+begin_src R
-  extracted.values <- mat[ext_ID$cell,]
+      save(mat,file=paste0(tile, "_train.RData"))
 
-  df <- data.frame(extracted.values)
-  colnames(df) <- names(train.stack)
+      extracted.values <- mat[ext_ID$cell,]
 
-  df$Class <- factor(ext_ID$Class)
-#+end_src
+      df <- data.frame(extracted.values)
+      colnames(df) <- names(train.stack)
 
-#+RESULTS:
+      df$Class <- factor(ext_ID$Class)
 
-#+begin_src R
-saveRDS(df, paste0(tile, "_model_building_df.rds"))
-#+end_src
+      saveRDS(df, paste0(tile, "_model_building_df.rds"))
 
-#+RESULTS:
+      df <- df %>% na.omit()
+      mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
-** Build model
-#+begin_src R
-df <- df %>% na.omit()
-mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
-#+end_src
-** predict onto cropped images
-#+begin_src R
-  cores <- length(tile.dirs)
 
-  cl <- makeCluster(cores)
-  registerDoParallel(cl)
+      cores <- length(tile.dirs)
+
+      cl <- makeCluster(cores)
+      registerDoParallel(cl)
 
       features <- foreach (tile.dir = tile.dirs,
                            .packages = c("raster","stringr","randomForest")) %dopar% {
@@ -13404,6 +13382,9 @@ mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
                                pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "_predicted.tif"), overwrite = T, datatype = "INT1U")
 
                            }
+
+  })
+
 #+end_src
 
 #+RESULTS:
