@@ -13349,8 +13349,8 @@ There were 50 or more warnings (use warnings() to see the first 50)
               mat[,i] <- train.stack[[i]][]
           }
 
-          save(mat,file=paste0(tile, "_train.RData"))
-        
+          save(mat,file=paste0(tile.dir, "_train.RData"))
+
           extracted.values <- mat[ext_ID$cell,]
 
           df <- data.frame(extracted.values)
@@ -13361,13 +13361,13 @@ There were 50 or more warnings (use warnings() to see the first 50)
           saveRDS(df, paste0(tile, "_model_building_df.rds"))
 
       })
-
-      dfs <- list.files(   )
+.......
+      dfs <- list.files("data/NAIPImages", pattern = paste0(".*",date,"_model_building_df.rds"))
 
       dfs <- lapply(dfs, readRDS)
-    
+
       df <- do.call("rbind", dfs)
-        
+
       df <- df %>% na.omit()
       mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
