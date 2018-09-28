@@ -1397,7 +1397,7 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 
 
 #+begin_src R
-  cores <- 
+  cores <- 35
 
   tile.dirs <- list.dirs("data/NAIPImages/")
 
