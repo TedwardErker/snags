@@ -13384,7 +13384,8 @@ There were 50 or more warnings (use warnings() to see the first 50)
 
                                st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
-                               names(st) <- str_replace(names(st), "masked_[0-9]+_", "masked_1_")
+                               to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
+                               names(st) <- str_replace(names(st), "masked_[0-9]+_", to_replace)
 
                                pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "_predicted.tif"), overwrite = T, datatype = "INT1U")
 
