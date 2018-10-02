@@ -1449,12 +1449,15 @@ Warning messages:
 
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
 
+  tile.dirs <- tile.dirs[2:length(tile.dirs)]
+
     lapply(tile.dirs, function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
-        lapply(tile.names, function(tile.name) {
 
+        lapply(tile.names, function(tile.name) {
             cl <- makeCluster(cores)
             registerDoParallel(cl)
+
 
             focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
             focal.fun <- c("mean","max","min")
@@ -1481,15 +1484,17 @@ Warning messages:
 
             fpdf <- focal.param.df %>% unite(com, raster.name, fun, window.diameter)
             tfpdf <- top.focal.param.df %>% unite(com, raster.name, fun, window.diameter)
-          
+
             focal.param.df <- focal.param.df[!fpdf$com %in% tfpdf$com,]
-          
+
             features <- foreach (i = 1:nrow(focal.param.df),
                                  .packages = c("raster","stringr"),
                                  .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %dopar% {
 
                                      make.focal.features(focal.param.df[i,])
                                  }
+
+            closeAllConnections()
         })
     })
 #+end_src
