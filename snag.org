@@ -1499,274 +1499,95 @@ Warning messages:
     })
 #+end_src
 
-#+RESULTS:
-#+begin_example
-[[1]]
-[[1]][[1]]
-NULL
-
-
-[[2]]
-[[2]][[1]]
-NULL
-
-
-[[3]]
-[[3]][[1]]
-NULL
-
-
-[[4]]
-[[4]][[1]]
-NULL
-
-
-[[5]]
-[[5]][[1]]
-NULL
-
-
-[[6]]
-[[6]][[1]]
-NULL
-
-
-[[7]]
-[[7]][[1]]
-NULL
-
-
-[[8]]
-[[8]][[1]]
-NULL
-
-[[8]][[2]]
-NULL
-
-
-[[9]]
-[[9]][[1]]
-NULL
-
-
-[[10]]
-[[10]][[1]]
-NULL
-
-
-[[11]]
-[[11]][[1]]
-NULL
-
-
-[[12]]
-[[12]][[1]]
-NULL
-
-
-[[13]]
-[[13]][[1]]
-NULL
-
-
-[[14]]
-[[14]][[1]]
-NULL
-
-
-[[15]]
-[[15]][[1]]
-NULL
-
-
-[[16]]
-[[16]][[1]]
-NULL
-
-
-[[17]]
-[[17]][[1]]
-NULL
-
-[[17]][[2]]
-NULL
-
-
-[[18]]
-[[18]][[1]]
-NULL
-
-
-[[19]]
-[[19]][[1]]
-NULL
-
-
-[[20]]
-[[20]][[1]]
-NULL
-
-[[20]][[2]]
-NULL
-
-
-[[21]]
-[[21]][[1]]
-NULL
-
-
-[[22]]
-[[22]][[1]]
-NULL
-
-
-[[23]]
-[[23]][[1]]
-NULL
-
-
-[[24]]
-[[24]][[1]]
-NULL
-
-
-[[25]]
-[[25]][[1]]
-NULL
-
-
-[[26]]
-[[26]][[1]]
-NULL
-#+end_example
-
 ** training data, Build model, and predict onto cropped images
 #+begin_src R
-  dates <- c("20130705","20130813")
-  dates <- c("20130813")
+    dates <- c("20130705","20130813")
+  #  dates <- c("20130813")
 
-                                          # for date in dates for which we have training data....
-  lapply(dates, function(date) {
-      tile.dirs <- list.dirs("data/NAIPImages/")
+                                            # for date in dates for which we have training data....
+    lapply(dates, function(date) {
+        tile.dirs <- list.dirs("data/NAIPImages/")
 
-      tile.dirs <- tile.dirs[grepl(paste0(".*",date), tile.dirs)]
+        tile.dirs <- tile.dirs[grepl(paste0(".*",date), tile.dirs)]
 
-      lapply(tile.dirs, function(tile.dir) {
+        lapply(tile.dirs, function(tile.dir) {
 
-          train.date.imgs <- paste0(tile.dir, "_",c("liveveg","livetrees","other","snag"),"_masked.tif")
-          if(file.exists(train.date.imgs[1])) {
-              train.date.imgs <- lapply(train.date.imgs, raster)
+            train.date.imgs <- paste0(tile.dir, "_",c("liveveg","livetrees","other","snag"),"_masked.tif")
+            if(file.exists(train.date.imgs[1])) {
+                train.date.imgs <- lapply(train.date.imgs, raster)
 
-              train.date.imgs <- lapply(train.date.imgs, function(r) {
-                  cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
-                  cells <- which(getValues(r > 0))
-                  df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
-              })
+                train.date.imgs <- lapply(train.date.imgs, function(r) {
+                    cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+                    cells <- which(getValues(r > 0))
+                    df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+                })
 
-              ext_ID <- do.call("bind", train.date.imgs)
+                ext_ID <- do.call("bind", train.date.imgs)
 
-              f <- list.files(tile.dir, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+                f <- list.files(tile.dir, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
 
-              train.stack <- stack(f)
+                train.stack <- stack(f)
 
-              fn <- paste0(tile.dir, ".ffdata")
+                fn <- paste0(tile.dir, ".ffdata")
 
-              mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
+                mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
+                                          #
+                                          #
+                                          #
+                                          #
+  ### We have a PROBLEM.  DATA is too big for FF OBJECTS!
+# need fewer layers or smaller training images!!! argggggg!!!
+                ####
+                #mat <- ff(vmode="integer",dim=c(6002410, 140), filename=fn)
 
-              for(i in 1:nlayers(train.stack)){
-                  mat[,i] <- train.stack[[i]][]
-              }
+                for(i in 1:nlayers(train.stack)){
+                    mat[,i] <- train.stack[[i]][]
+                }
 
-              save(mat,file=paste0(tile.dir, "_train.RData"))
+                save(mat,file=paste0(tile.dir, "_train.RData"))
 
-              extracted.values <- mat[ext_ID$cell,]
+                extracted.values <- mat[ext_ID$cell,]
 
-              df <- data.frame(extracted.values)
-              colnames(df) <- names(train.stack)
+                df <- data.frame(extracted.values)
+                colnames(df) <- names(train.stack)
 
-              df$Class <- factor(ext_ID$Class)
+                df$Class <- factor(ext_ID$Class)
 
-              saveRDS(df, paste0(tile.dir, "_model_building_df.rds"))
-          }
-      })
+                saveRDS(df, paste0(tile.dir, "_model_building_df.rds"))
+            }
+        })
 
-      dfs <- list.files("data/NAIPImages", pattern = paste0(".*",date,"_model_building_df.rds"), full.names = T, recursive = T)
+        dfs <- list.files("data/NAIPImages", pattern = paste0(".*",date,"_model_building_df.rds"), full.names = T, recursive = T)
 
-      dfs <- lapply(dfs, readRDS)
+        dfs <- lapply(dfs, readRDS)
 
-      df <- do.call("rbind", dfs)
+        df <- do.call("rbind", dfs)
 
-      df <- df %>% na.omit()
-      mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+        df <- df %>% na.omit()
+        mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
 
-      cores <- length(tile.dirs)
+        cores <- length(tile.dirs)
 
-      cl <- makeCluster(cores)
-      registerDoParallel(cl)
+        cl <- makeCluster(cores)
+        registerDoParallel(cl)
 
-      features <- foreach (tile.dir = tile.dirs,
-                           .packages = c("raster","stringr","randomForest")) %dopar% {
+        features <- foreach (tile.dir = tile.dirs,
+                             .packages = c("raster","stringr","randomForest")) %dopar% {
 
-                               st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
+                                 st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
-                               to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
-                               names(st) <- str_replace(names(st), "masked_[0-9]+_", to_replace)
+                                 to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
+                                 names(st) <- str_replace(names(st), "masked_[0-9]+_", to_replace)
 
-                               pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "_predicted.tif"), overwrite = T, datatype = "INT1U")
+                                 pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "_predicted.tif"), overwrite = T, datatype = "INT1U")
 
-                           }
+                             }
 
-  })
+    })
 
 #+end_src
 
 #+RESULTS:
-#+begin_example
-[[1]]
-[[1]][[1]]
-class       : RasterLayer 
-dimensions  : 6750, 1934, 13054500  (nrow, ncol, ncell)
-resolution  : 1, 1  (x, y)
-extent      : 683720, 685654, 4915810, 4922560  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=utm +zone=15 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
-data source : /home/erker/snag/data/NAIPImages/BlackRiverSF2013/m_4409035_se_15_1_20130813_predicted.tif 
-names       : m_4409035_se_15_1_20130813_predicted 
-values      : 1, 4  (min, max)
-
-
-[[1]][[2]]
-class       : RasterLayer 
-dimensions  : 6986, 3903, 27266358  (nrow, ncol, ncell)
-resolution  : 1, 1  (x, y)
-extent      : 680647, 684550, 4915670, 4922656  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=utm +zone=15 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
-data source : /home/erker/snag/data/NAIPImages/BlackRiverSF2013/m_4409035_sw_15_1_20130813_predicted.tif 
-names       : m_4409035_sw_15_1_20130813_predicted 
-values      : 1, 4  (min, max)
-
-
-[[1]][[3]]
-class       : RasterLayer 
-dimensions  : 2588, 4093, 10592684  (nrow, ncol, ncell)
-resolution  : 1, 1  (x, y)
-extent      : 680647, 684740, 4913852, 4916440  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=utm +zone=15 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
-data source : /home/erker/snag/data/NAIPImages/BlackRiverSF2013/m_4409043_nw_15_1_20130813_predicted.tif 
-names       : m_4409043_nw_15_1_20130813_predicted 
-values      : 1, 4  (min, max)
-
-
-
-Warning messages:
-1: In .Internal(gc(verbose, reset)) :
-  closing unused connection 7 (<-localhost:11459)
-2: In .Internal(gc(verbose, reset)) :
-  closing unused connection 4 (<-localhost:11459)
-3: In .Internal(gc(verbose, reset)) :
-  closing unused connection 3 (<-localhost:11459)
-4: In .Internal(gc(verbose, reset)) :
-  closing unused connection 6 (<-localhost:11459)
-5: In .Internal(gc(verbose, reset)) :
-  closing unused connection 5 (<-localhost:11459)
-#+end_example
+: Error in ff(vmode = "integer", dim = c(ncell(train.stack), nlayers(train.stack)),  : 
+:   length exceeds file length
