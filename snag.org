@@ -1,7 +1,8 @@
 #+TITLE:Classify Snags
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
-#+PROPERTY: header-args:R :session *R:snag:krusty* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:krusty* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
@@ -32,78 +33,12 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
-#+begin_example
-Loading required package: bit
-Attaching package bit
-package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
-creators: bit bitwhich
-coercion: as.logical as.integer as.bit as.bitwhich which
-operator: ! & | xor != ==
-querying: print length any all min max range sum summary
-bit access: length<- [ [<- [[ [[<-
-for more help type ?bit
-
-Attaching package: ‘bit’
-
-The following object is masked from ‘package:base’:
-
-    xor
-
-Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpkTNS0o"
-
-- getOption("ffextension")=="ff"
-
-- getOption("ffdrop")==TRUE
-
-- getOption("fffinonexit")==TRUE
-
-- getOption("ffpagesize")==65536
-
-- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
-
-- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
-
-- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
-
-
-Attaching package: ‘ff’
-
-The following objects are masked from ‘package:bit’:
-
-    clone, clone.default, clone.list
-
-The following objects are masked from ‘package:raster’:
-
-    filename, is.factor, ncol<-, nrow<-
-
-The following objects are masked from ‘package:utils’:
-
-    write.csv, write.csv2
-
-The following objects are masked from ‘package:base’:
-
-    is.factor, is.ordered
-randomForest 4.6-12
-Type rfNews() to see new features/changes/bug fixes.
-
-Attaching package: ‘randomForest’
-
-The following object is masked from ‘package:dplyr’:
-
-    combine
-Loading required package: foreach
-foreach: simple, scalable parallel programming from Revolution Analytics
-Use Revolution R for scalability, fault tolerance and more.
-http://www.revolutionanalytics.com
-Loading required package: iterators
-#+end_example
 
 * bits
 ** texture params
 #+begin_src R
   band.for.texture.appendage = "_ratio.nir"
-  window <- list(c(3,3), c(5,5), c(7,7))
+  window <- list(c(3,3), c(5,5))
   statistics = list("homogeneity", "contrast", "correlation", "entropy")
   shift = list(c(0,1),c(1,0),c(1,1),c(-1,1))
   texture.params <- expand.grid(band.appendage = band.for.texture.appendage,window = window, statistics = statistics, shift = shift, stringsAsFactors = F)
@@ -873,7 +808,7 @@ plot(s, add = T)
                  tile.name = "m_4409047_ne_15_1_20130701_train",
                  band.names = c("red","green","blue","nir"),
                  ratio.bands = c("red","green","blue","nir"),
-                 texture = F,
+                 texture = T,
                  texture.params.df = texture.params)
 
 #+end_src
