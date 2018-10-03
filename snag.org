@@ -97,7 +97,7 @@ x[x < mnx] <- mnx
       tile.dir <- dirname(tile.path)
       tile.name <- str_sub(basename(tile.path),1,-5)
       fn = paste0(tile.dir,"/", tile.basename,band.appendage, "_stat.", statistics, "_", win.size,"_",shift.dir,".tif")
-      writeRaster(texture, fn, overwrite = T)
+      writeRaster(texture, fn, overwrite = T, datatype = 'INT1U'))
       }
 
           calc.texture <- function(texture.params.df,
