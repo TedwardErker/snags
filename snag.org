@@ -62,6 +62,14 @@ library(randomForest)
 #+results:
 *** Add Texture
 #+begin_src R
+  trunc.rescale.0.254 <- function(raster,
+                            min,
+                            max) {
+      raster[raster < min] <- min
+      raster[raster > max] <- max
+      (raster - min)/(max-min) * 254
+  }
+
     named.glcm <- function(tile.dir, tile.basename, band.appendage, window, statistics, shift, na_opt, na_val,...) {
 
         tile.path <- paste0(tile.dir, "/", tile.basename,band.appendage,".tif")
@@ -84,22 +92,24 @@ library(randomForest)
 
         if (statistics == "correlation") {
             texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x =mnx, max_x = mxx)
-            texture[texture == -Inf] <- -1
-            texture[texture == Inf] <- 1
+            texture[texture < -1] <- -1
+            texture[texture > 1] <- 1
             texture[is.na(texture)] <- 1
         } else {
             texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x = mnx, max_x =mxx)
-            if(statistics == "homogeneity") {
-              texture <- 
+            if(statistics == "homogeneity") texture <- trunc.rescale.0.254(texture, 0, 1)
+            if(statistics == "contrast")  texture <- trunc.rescale.0.254(texture, 0, 70)
+            if(statistics == "entropy")  texture <- trunc.rescale.0.254(texture, 0, 4)
+
         }
         win.size <- paste0("window.",window[1])
         shift.dir <- paste0("angle.",atan(shift[1]/shift[2])*180/pi) # calc shift angle
         shift.dir <- str_replace(shift.dir, "-","neg")
 
-        tile.dir <- dirname(tile.path)
+        tile.dir <- dnirname(tile.path)
         tile.name <- str_sub(basename(tile.path),1,-5)
         fn = paste0(tile.dir,"/", tile.basename,band.appendage, "_stat.", statistics, "_", win.size,"_",shift.dir,".tif")
-        writeRaster(texture, fn, overwrite = T) #, datatype = 'INT1U')
+        writeRaster(texture, fn, overwrite = T, datatype = 'INT1U')
         }
 
             calc.texture <- function(texture.params.df,
