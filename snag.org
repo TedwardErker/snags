@@ -95,7 +95,7 @@ library(randomForest)
             texture[texture < -1] <- -1
             texture[texture > 1] <- 1
             texture[is.na(texture)] <- 1
-            texture <- rescale.0.254(texture, 0, 1)
+            texture <- rescale.0.254(texture, -1, 1)
         } else {
             texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x = mnx, max_x =mxx)
             if(statistics == "homogeneity") texture <- trunc.rescale.0.254(texture, 0, 1)
@@ -124,7 +124,7 @@ library(randomForest)
                                   window = texture.params.df$window,
                                   statistics = texture.params.df$statistics,
                                   shift = texture.params.df$shift,
-                                  na_opt = "ignore",
+                                  na_opt = "center",
                                   na_val = NA)
             }
 
@@ -822,7 +822,6 @@ plot(s, add = T)
 #+end_src
 
 #+RESULTS:
-: Error in dnirname(tile.path) : could not find function "dnirname"
 
 
 #+begin_src R
