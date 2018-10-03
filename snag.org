@@ -70,15 +70,17 @@ library(randomForest)
       mnx <- NULL
       mxx <- NULL
       if(band.appendage == "_ratio.nir") {
-          mnx <- 27
-          mxx <-97
+          mnx <- 20
+          mxx <- 115
       }
 
       if (band.appendage == "_ratio.red") {
           mnx <- 27
           mxx <-97
       }
-
+    
+x[x > mxx] <- mxx
+x[x < mnx] <- mnx
 
       if (statistics == "correlation") {
           texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x =mnx, max_x = mxx)
@@ -90,6 +92,7 @@ library(randomForest)
       }
       win.size <- paste0("window.",window[1])
       shift.dir <- paste0("angle.",atan(shift[1]/shift[2])*180/pi) # calc shift angle
+      shift.dir <- str_replace(shift.dir, "-","neg")
 
       tile.dir <- dirname(tile.path)
       tile.name <- str_sub(basename(tile.path),1,-5)
@@ -776,14 +779,6 @@ r <- stack("data/image/m_4409047_ne_15_1_20130701.tif")
 #+end_src
 
 #+RESULTS:
-** training
-#+begin_src R
-s <- shapefile("data/training/Sandhill_training_data_new.shp")
-s <- spTransform(s, proj4string(r))
-#+end_src
-
-#+RESULTS:
-
 * crop image to subset of training
 #+begin_src R
 rc <- crop(r, extent(s))
@@ -847,7 +842,14 @@ plot(s, add = T)
 
 * stack training
 #+begin_src R
-train.stack <- stack(list.files("data/image/train", full.names = T, pattern = ".*train_.*.tif$"))
+  train.stack <- stack(list.files("data/image/train", full.names = T, pattern = ".*train_.*.tif$"))
+  f <- list.files("data/image/train", full.names = T, pattern = ".*train_.*.tif$")
+
+  conv <- str_extract(f, ".*windowcircle.(11|2|4|8).*") %>% na.omit()
+  text <- str_extract(f, ".*stat.*") %>% na.omit()
+  f <- c(conv, text)
+  train.stack <- stack(f)
+
 #+end_src
 
 #+RESULTS:
@@ -922,7 +924,7 @@ df <- readRDS("data/training/model_building_df.rds")
 #+RESULTS:
 
 #+begin_src R
-df <- df[,!grepl(".*stat.*",colnames(df))]
+#df <- df[,!grepl(".*stat.*",colnames(df))]
 #+end_src
 
 #+RESULTS:
