@@ -221,3 +221,18 @@ Trim away NA's
 
 
 #+end_src
+
+* training
+:PROPERTIES:
+:ARCHIVE_TIME: 2018-10-03 Wed 10:57
+:ARCHIVE_FILE: ~/git/snag/snag.org
+:ARCHIVE_OLPATH: data
+:ARCHIVE_CATEGORY: snag
+:END:
+#+begin_src R
+s <- shapefile("data/training/Sandhill_training_data_new.shp")
+s <- spTransform(s, proj4string(r))
+#+end_src
+
+#+RESULTS:
+

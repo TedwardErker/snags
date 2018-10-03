@@ -62,58 +62,60 @@ library(randomForest)
 #+results:
 *** Add Texture
 #+begin_src R
-  named.glcm <- function(tile.dir, tile.basename, band.appendage, window, statistics, shift, na_opt, na_val,...) {
+    named.glcm <- function(tile.dir, tile.basename, band.appendage, window, statistics, shift, na_opt, na_val,...) {
 
-      tile.path <- paste0(tile.dir, "/", tile.basename,band.appendage,".tif")
-      x <- raster(tile.path)
+        tile.path <- paste0(tile.dir, "/", tile.basename,band.appendage,".tif")
+        x <- raster(tile.path)
 
-      mnx <- NULL
-      mxx <- NULL
-      if(band.appendage == "_ratio.nir") {
-          mnx <- 20
-          mxx <- 115
-      }
+        mnx <- NULL
+        mxx <- NULL
+        if(band.appendage == "_ratio.nir") {
+            mnx <- 20
+            mxx <- 115
+        }
 
-      if (band.appendage == "_ratio.red") {
-          mnx <- 27
-          mxx <-97
-      }
-    
-x[x > mxx] <- mxx
-x[x < mnx] <- mnx
+        if (band.appendage == "_ratio.red") {
+            mnx <- 27
+            mxx <-97
+        }
 
-      if (statistics == "correlation") {
-          texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x =mnx, max_x = mxx)
-          texture[texture == -Inf] <- -1
-          texture[texture == Inf] <- 1
-          texture[is.na(texture)] <- 1
-      } else {
-          texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x = mnx, max_x =mxx)
-      }
-      win.size <- paste0("window.",window[1])
-      shift.dir <- paste0("angle.",atan(shift[1]/shift[2])*180/pi) # calc shift angle
-      shift.dir <- str_replace(shift.dir, "-","neg")
+  x[x > mxx] <- mxx
+  x[x < mnx] <- mnx
 
-      tile.dir <- dirname(tile.path)
-      tile.name <- str_sub(basename(tile.path),1,-5)
-      fn = paste0(tile.dir,"/", tile.basename,band.appendage, "_stat.", statistics, "_", win.size,"_",shift.dir,".tif")
-      writeRaster(texture, fn, overwrite = T, datatype = 'INT1U'))
-      }
+        if (statistics == "correlation") {
+            texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x =mnx, max_x = mxx)
+            texture[texture == -Inf] <- -1
+            texture[texture == Inf] <- 1
+            texture[is.na(texture)] <- 1
+        } else {
+            texture <- glcm(x, window = window, statistics = statistics, shift = shift, na_opt = na_opt, na_val = na_val, min_x = mnx, max_x =mxx)
+            if(statistics == "homogeneity") {
+              texture <- 
+        }
+        win.size <- paste0("window.",window[1])
+        shift.dir <- paste0("angle.",atan(shift[1]/shift[2])*180/pi) # calc shift angle
+        shift.dir <- str_replace(shift.dir, "-","neg")
 
-          calc.texture <- function(texture.params.df,
-                                   tile.dir,
-                                   tile.basename) {
+        tile.dir <- dirname(tile.path)
+        tile.name <- str_sub(basename(tile.path),1,-5)
+        fn = paste0(tile.dir,"/", tile.basename,band.appendage, "_stat.", statistics, "_", win.size,"_",shift.dir,".tif")
+        writeRaster(texture, fn, overwrite = T) #, datatype = 'INT1U')
+        }
 
-              texture <- mapply(named.glcm,
-                                tile.dir = tile.dir,
-                                tile.basename = tile.basename,
-                                band.appendage = texture.params.df$band.appendage,
-                                window = texture.params.df$window,
-                                statistics = texture.params.df$statistics,
-                                shift = texture.params.df$shift,
-                                na_opt = "ignore",
-                                na_val = NA)
-          }
+            calc.texture <- function(texture.params.df,
+                                     tile.dir,
+                                     tile.basename) {
+
+                texture <- mapply(named.glcm,
+                                  tile.dir = tile.dir,
+                                  tile.basename = tile.basename,
+                                  band.appendage = texture.params.df$band.appendage,
+                                  window = texture.params.df$window,
+                                  statistics = texture.params.df$statistics,
+                                  shift = texture.params.df$shift,
+                                  na_opt = "ignore",
+                                  na_val = NA)
+            }
 
 #+end_src
 
