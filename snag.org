@@ -900,16 +900,22 @@ liveveg <- raster("data/training/liveveg.png")
 
 #+begin_src R :eval yes
 
-  mat1 <- ff(vmode="integer",dim=c(ncell(train.stack),85),filename="data/image/train/trainstack.ffdata")
-  mat2 <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)-85),filename="data/image/train/trainstack.ffdata")
+  mat1 <- ff(vmode="integer",dim=c(ncell(train.stack),80),filename="data/image/train/trainstack1.ffdata")
+  mat2 <- ff(vmode="integer",dim=c(ncell(train.stack),80),filename="data/image/train/trainstack2.ffdata")
+  mat3 <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)-160),filename="data/image/train/trainstack3.ffdata")
 
-  for(i in 1:85){
+  for(i in 1:80){
       mat1[,i] <- train.stack[[i]][]
   }
 
-  for(i in 1:(nlayers(train.stack)-85)){
-      mat2[,i] <- train.stack[[i]][]
+  for(i in 1:80){
+      mat2[,i] <- train.stack[[80+i]][]
   }
+
+  for(i in 1:(nlayers(train.stack)-160)){
+      mat3[,i] <- train.stack[[160+i]][]
+  }
+
 
   save(mat1,file="data/image/train/train_stack_mat1.RData")
   save(mat2,file="data/image/train/train_stack_mat2.RData")
@@ -926,6 +932,10 @@ liveveg <- raster("data/training/liveveg.png")
 #+end_src
 
 #+RESULTS:
+: Error in ff(vmode = "integer", dim = c(ncell(train.stack), nlayers(train.stack) -  : 
+:   length exceeds file length
+: Error in .local(.Object, ...) :
+: Error in .local(.Object, ...) :
 
 #+begin_src R
 saveRDS(df, "data/training/model_building_df.rds")
