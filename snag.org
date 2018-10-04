@@ -19,7 +19,7 @@
 | [2018-09-28 Fri 9:00]  | [2018-09-28 Fri 12:00] |     3 |   |   |
 | [2018-10-02 Tue 10:00] | [2018-10-02 Tue 11:00] |     1 |   |   |
 | [2018-10-03 Wed 10:00] | [2018-10-03 Wed 14:00] |     4 |   |   |
-| [2018-10-04 Thu 8:30]  | d                      |       |   |   |
+| [2018-10-04 Thu 8:30]  |                        |       |   |   |
 
 * libraries
 #+begin_src R
@@ -39,7 +39,7 @@ library(randomForest)
 ** texture params
 #+begin_src R
   band.for.texture.appendage = "_ratio.nir"
-  window <- list(c(11,11), c(5,5), c(7,7), c(9,9))
+  window <- list(c(5,5), c(7,7), c(13,13))
   statistics = list("homogeneity", "contrast", "correlation", "entropy")
   shift = list(c(0,1),c(1,0),c(1,1),c(-1,1))
   texture.params <- expand.grid(band.appendage = band.for.texture.appendage,window = window, statistics = statistics, shift = shift, stringsAsFactors = F)
@@ -835,7 +835,7 @@ plot(s, add = T)
 
     focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
     focal.fun <- c("mean","max","min")
-    focal.window.diameter <- c(1,2,4,8,11)
+    focal.window.diameter <- c(2,4,8,11)
 
     tile.names <- remove.tif.ext(list.files("data/image/train", focal.feature.pattern))
 
@@ -857,12 +857,13 @@ plot(s, add = T)
 * stack training
 #+begin_src R
   train.stack <- stack(list.files("data/image/train", full.names = T, pattern = ".*train_.*.tif$"))
-  f <- list.files("data/image/train", full.names = T, pattern = ".*train_.*.tif$")
 
-  conv <- str_extract(f, ".*windowcircle.(11|2|4|8).*") %>% na.omit()
-  text <- str_extract(f, ".*stat.*window.(5|11).*") %>% na.omit()
-  f <- c(conv, text)
-  train.stack <- stack(f)
+  ## f <- list.files("data/image/train", full.names = T, pattern = ".*train_.*.tif$")
+
+  ## conv <- str_extract(f, ".*windowcircle.(11|2|4|8).*") %>% na.omit()
+  ## text <- str_extract(f, ".*stat.*window.(5|11).*") %>% na.omit()
+  ## f <- c(conv, text)
+  ## train.stack <- stack(f)
 
 #+end_src
 
@@ -961,7 +962,7 @@ mod_all <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
 snag specific model to identify the features most important for
 distinguishing snags
-#+begin_src R :eval no
+#+begin_src R :eval yes
 sdf <- df %>% mutate(Class = ifelse(Class == "snag", 1, 0))
 snag_mod <- randomForest(y = factor(sdf$Class), x= sdf[,1:(dim(sdf)[2]-1)])
 saveRDS(snag_mod, "data/training/snag_mod.rds")
