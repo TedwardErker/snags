@@ -1300,9 +1300,9 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 
 #+RESULTS:
 #+begin_example
-rgeos version: 0.3-23, (SVN revision 546)
- GEOS runtime version: 3.5.0-CAPI-1.9.0 r4084 
- Linking to sp version: 1.2-4 
+rgeos version: 0.3-26, (SVN revision 560)
+ GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
+ Linking to sp version: 1.2-7 
  Polygon checking: TRUE
 Checking rgeos availability: TRUE
 
@@ -1376,6 +1376,8 @@ Warning messages:
       }
   })
 #+end_src
+** Get all the file names for the training data correct
+** send to krusty.....
 ** add some additional features/layers
 
 #+begin_src R
