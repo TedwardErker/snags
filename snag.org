@@ -1377,7 +1377,6 @@ Warning messages:
   })
 #+end_src
 ** Get all the file names for the training data correct
-** send to krusty.....
 ** add some additional features/layers
 
 #+begin_src R
