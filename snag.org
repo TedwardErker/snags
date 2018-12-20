@@ -1300,36 +1300,14 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
-#+begin_example
-rgeos version: 0.3-26, (SVN revision 560)
- GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
- Linking to sp version: 1.2-7 
- Polygon checking: TRUE
-Checking rgeos availability: TRUE
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:rgeos’:
-
-    intersect, setdiff, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Attaching package: ‘raster’
-
-The following object is masked from ‘package:dplyr’:
-
-    select
-Warning messages:
-1: Setting row names on a tibble is deprecated. 
-2: Setting row names on a tibble is deprecated.
-#+end_example
+: rgeos version: 0.3-23, (SVN revision 546)
+:  GEOS runtime version: 3.5.0-CAPI-1.9.0 r4084 
+:  Linking to sp version: 1.2-4 
+:  Polygon checking: TRUE
+: Checking rgeos availability: TRUE
+: Warning messages:
+: 1: Setting row names on a tibble is deprecated. 
+: 2: Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
 #+begin_src R
 
@@ -1377,7 +1355,6 @@ Warning messages:
       }
   })
 #+end_src
-** Get all the file names for the training data correct
 ** add some additional features/layers
 
 #+begin_src R
