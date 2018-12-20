@@ -24,7 +24,7 @@
 |                        |                        |       | [2018-10-22 Mon] | I submitted 40 hours for the 10/4 - 10/26 pay period |
 | [2018-10-22 Mon 16:30] | [2018-10-22 Mon 17:00] |       |                  |                                                      |
 | [2018-12-18 Tue 11:00] | [2018-12-18 Tue 14:00] |       |                  |                                                      |
-| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu ]      |       |                  |                                                      |
+| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu 15:00] | 2     |                  |                                                      |
 
 * libraries
 #+begin_src R
@@ -994,7 +994,7 @@ top
 9          959.62803                  X_ndvi_windowcircle.4_fun.mean
 10         917.44394                                           X_nir
 11         912.35043                                    X_ratio.blue
-12         911.01801                                         X_green
+12         911.01801                                         X_green  
 13         774.56996             X_ratio.blue_windowcircle.2_fun.max
 14         755.73220            X_ratio.blue_windowcircle.8_fun.mean
 15         737.34341                                          X_ndvi
