@@ -23,7 +23,8 @@
 | [2018-10-04 Thu 8:30]  | [2018-10-04 Thu 11:30] |     3 |                  |                                                      |
 |                        |                        |       | [2018-10-22 Mon] | I submitted 40 hours for the 10/4 - 10/26 pay period |
 | [2018-10-22 Mon 16:30] | [2018-10-22 Mon 17:00] |       |                  |                                                      |
-| [2018-12-18 Tue 11:00] | [2018-12-18 Tue]       |       |                  |                                                      |
+| [2018-12-18 Tue 11:00] | [2018-12-18 Tue 14:00] |       |                  |                                                      |
+| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu ]      |       |                  |                                                      |
 
 * libraries
 #+begin_src R
@@ -1564,7 +1565,7 @@ by an hour, so I'm going to just build one model for flambeau
   lapply(imgs, function(img) {
 
       train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
-    
+
       train.imgs <- lapply(train.imgs, raster)
 
       train.imgs <- lapply(train.imgs, function(r) {
@@ -1579,23 +1580,20 @@ by an hour, so I'm going to just build one model for flambeau
 
       train.stack <- stack(f)
 
-      fn <- paste0(tile.dir, ".ffdata")
+      fn <- paste0(f.dir,img, ".ffdata")
 
       mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
                                           #
                                           #
                                           #
                                           #
-  ### We have a PROBLEM.  DATA is too big for FF OBJECTS!
-                                          # need fewer layers or smaller training images!!! argggggg!!!
-  ####
-                                          #mat <- ff(vmode="integer",dim=c(6002410, 140), filename=fn)
+  ### if data is too big for ff, need fewer layers or smaller training images!!! argggggg!!!
 
       for(i in 1:nlayers(train.stack)){
           mat[,i] <- train.stack[[i]][]
       }
 
-      save(mat,file=paste0(tile.dir, "_train.RData"))
+      save(mat,file=paste0(f.dir,img, "_train.RData"))
 
       extracted.values <- mat[ext_ID$cell,]
 
@@ -1604,7 +1602,7 @@ by an hour, so I'm going to just build one model for flambeau
 
       df$Class <- factor(ext_ID$Class)
 
-      saveRDS(df, paste0(tile.dir, "_model_building_df.rds"))
+      saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
   }
   })
 
