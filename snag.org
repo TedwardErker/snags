@@ -1619,6 +1619,9 @@ by an hour, so I'm going to just build one model for flambeau
   df <- df %>% na.omit()
   mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
+  mod.snag
+
+
   saveRDS(mod, paste0(f.dir, "mod.rds"))
 
   cores <- length(tile.dirs)
