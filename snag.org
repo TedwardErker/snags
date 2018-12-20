@@ -1603,18 +1603,23 @@ by an hour, so I'm going to just build one model for flambeau
       df$Class <- factor(ext_ID$Class)
 
       saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
-  }
   })
 
-  dfs <- list.files("data/NAIPImages", pattern = paste0(".*",date,"_model_building_df.rds"), full.names = T, recursive = T)
+
+  dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.rds"), full.names = T, recursive = T)
 
   dfs <- lapply(dfs, readRDS)
+
+  for(i in 1:length(dfs)) {
+      colnames(dfs[[i]])[1:(length(colnames(dfs[[i]]))-1)] <- str_match(colnames(dfs[[i]]), "^(masked_[0-9]+_)(.*)")[,3][1:(length(colnames(dfs[[i]]))-1)]
+  }
 
   df <- do.call("rbind", dfs)
 
   df <- df %>% na.omit()
   mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
+  saveRDS(mod, paste0(f.dir, "mod.rds"))
 
   cores <- length(tile.dirs)
 
@@ -1640,3 +1645,75 @@ by an hour, so I'm going to just build one model for flambeau
 #+RESULTS:
 : Error in ff(vmode = "integer", dim = c(ncell(train.stack), nlayers(train.stack)),  : 
 :   length exceeds file length
+
+
+
+** NHAL
+NHAL is all in the same flightline.
+#+begin_src R
+  f.dir <- "data/NAIPImages/NHAL2013/"
+
+  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*.tif$") %>% na.omit()
+
+  imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
+
+  lapply(imgs, function(img) {
+
+      train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
+
+      train.imgs <- lapply(train.imgs, raster)
+
+      train.imgs <- lapply(train.imgs, function(r) {
+          cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+          cells <- which(getValues(r > 0))
+          df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+      })
+
+      ext_ID <- do.call("bind", train.imgs)
+
+      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+
+      train.stack <- stack(f)
+
+      fn <- paste0(f.dir,img, ".ffdata")
+
+      mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
+                                          #
+                                          #
+                                          #
+                                          #
+  ### if data is too big for ff, need fewer layers or smaller training images!!! argggggg!!!
+
+      for(i in 1:nlayers(train.stack)){
+          mat[,i] <- train.stack[[i]][]
+      }
+
+      save(mat,file=paste0(f.dir,img, "_train.RData"))
+
+      extracted.values <- mat[ext_ID$cell,]
+
+      df <- data.frame(extracted.values)
+      colnames(df) <- names(train.stack)
+
+      df$Class <- factor(ext_ID$Class)
+
+      saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
+  })
+
+
+  dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.rds"), full.names = T, recursive = T)
+
+  dfs <- lapply(dfs, readRDS)
+
+  for(i in 1:length(dfs)) {
+      colnames(dfs[[i]])[1:(length(colnames(dfs[[i]]))-1)] <- str_match(colnames(dfs[[i]]), "^(masked_[0-9]+_)(.*)")[,3][1:(length(colnames(dfs[[i]]))-1)]
+  }
+
+  df <- do.call("rbind", dfs)
+
+  df <- df %>% na.omit()
+  mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+
+  saveRDS(mod, paste0(f.dir, "mod.rds"))
+
+#+end_src
