@@ -1384,31 +1384,31 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
 #+begin_src R
 
-    tile.dirs <- list.dirs("data/NAIPImages/")
+  tile.dirs <- list.dirs("data/NAIPImages/")
+  tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
+    lapply(tile.dirs, function(tile.dir) {
+        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
+      lapply(tile.names, function(tile.name) {
 
-      lapply(tile.dirs, function(tile.dir) {
-          tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
-        lapply(tile.names, function(tile.name) {
-
-            add.features(tile.dir = tile.dir,
-                         tile.name = tile.name,
-                         band.names = c("red","green","blue","nir"),
-                         ratio.bands = c("red","green","blue","nir"),
-                         texture = F,
-                         texture.params.df = texture.params)
-    })
-    })
+          add.features(tile.dir = tile.dir,
+                       tile.name = tile.name,
+                       band.names = c("red","green","blue","nir"),
+                       ratio.bands = c("red","green","blue","nir"),
+                       texture = F,
+                       texture.params.df = texture.params)
+  })
+  })
 #+end_src
 
 
 #+begin_src R
+library(tidyr)
+
   cores <- 40
 
   tile.dirs <- list.dirs("data/NAIPImages/")
-
-    tile.dirs <- tile.dirs[grepl(".*[0-9]{8}$", tile.dirs)]
+  tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
   tile.dirs <- tile.dirs[2:length(tile.dirs)]
 
@@ -1460,7 +1460,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
     })
 #+end_src
 
-** training data, Build model, and predict onto cropped images
+** Black River training data, Build model, and predict onto cropped images
 
 #+begin_src R
     dates <- c("20130705","20130813")
