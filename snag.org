@@ -1651,17 +1651,10 @@ by an hour, so I'm going to just build one model for flambeau
 
                            names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
 
-                           pred.r <- raster::predict(st, mod, filename = paste0(img, "_predicted.tif"), overwrite = T, datatype = "INT1U")
+                           pred.r <- raster::predict(st, mod, filename = paste0(f.dir,img, "_predicted.tif"), overwrite = T, datatype = "INT1U")
 
                        }
-
-
 #+end_src
-
-#+RESULTS:
-: Error in ff(vmode = "integer", dim = c(ncell(train.stack), nlayers(train.stack)),  : 
-:   length exceeds file length
-
 
 
 ** NHAL
