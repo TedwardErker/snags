@@ -1619,25 +1619,33 @@ by an hour, so I'm going to just build one model for flambeau
   df <- do.call("rbind", dfs)
 
   df <- df %>% na.omit()
-  mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
 
-  mod.snag
+  df.s <- filter(df, Class == "snag")
+  df.allelse <- filter(df, Class != "snag")
+  df.sub <- sample_n(df.allelse, 20000)
+  df.sub <- rbind(df.s, df.sub)
+
+  mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
 
   saveRDS(mod, paste0(f.dir, "mod.rds"))
 
-  cores <- length(tile.dirs)
+
+  img.dirs <- list.files(f.dir, pattern = "m_.*[0-9]{8}$", full.names = T)
+
+  cores <- length(img.dirs)
 
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
-  features <- foreach (tile.dir = tile.dirs,
+  features <- foreach (img.dir = img.dirs,
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
-                           st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
+                           st <- stack(list.files(img.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
-                           to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
-                           names(st) <- str_replace(names(st), "masked_[0-9]+_", to_replace)
+  #                         to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
+
+                           names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
 
                            pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "_predicted.tif"), overwrite = T, datatype = "INT1U")
 
