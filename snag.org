@@ -1622,7 +1622,7 @@ by an hour, so I'm going to just build one model for flambeau
 
   df.s <- filter(df, Class == "snag")
   df.allelse <- filter(df, Class != "snag")
-  df.sub <- sample_n(df.allelse, 20000)
+  df.sub <- sample_n(df.allelse, 250000)
   df.sub <- rbind(df.s, df.sub)
 
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
@@ -1655,6 +1655,15 @@ by an hour, so I'm going to just build one model for flambeau
                            pred.r <- raster::predict(st, mod, filename = paste0(f.dir,img, "_predicted.tif"), overwrite = T, datatype = "INT1U")
 
                        }
+
+
+
+
+
+
+
+
+
 #+end_src
 
 
