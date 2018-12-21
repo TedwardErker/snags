@@ -1276,44 +1276,38 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 ** read points
 
 #+begin_src R
-        library(readxl)
-        library(sp)
-        library(rgeos)
-        library(maptools)
-        library(dplyr)
-        library(raster)
-    library(stringr)
-        d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
-        coordinates(d) <- ~long + lat
-        proj4string(d) <- CRS("+init=epsg:4326")
+          library(readxl)
+          library(sp)
+          library(rgeos)
+          library(maptools)
+          library(dplyr)
+          library(raster)
+      library(stringr)
+          d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
+          coordinates(d) <- ~long + lat
+          proj4string(d) <- CRS("+init=epsg:4326")
 
-        utms <- c("15","16")
-        bufs <- lapply(utms, function(utm) {
-            p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
-            buf <- gBuffer(p, width = 2000, byid = T)
-            buf <- gUnion(buf, buf)
-            buf <- disaggregate(buf)
-            buf
-    })
-
-
-    names(bufs) <- c("utm15","utm16")
-    shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
-    shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
-
-  
-p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +y_0=-4480000 +ellps=GRS80 +units=m +no_defs"))
-
-  bufs$wtm <- disaggregate(buf)
-
-            buf <- gBuffer(p, width = 2000, byid = T)
-            buf <- gUnion(buf, buf)
-            buf <- disaggregate(buf)
-            buf
-    })
+          utms <- c("15","16")
+          bufs <- lapply(utms, function(utm) {
+              p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
+              buf <- gBuffer(p, width = 2000, byid = T)
+              buf <- gUnion(buf, buf)
+              buf <- disaggregate(buf)
+              buf
+      })
 
 
-    shapefile(bufs$wtm, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
+      names(bufs) <- c("utm15","utm16")
+      shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
+      shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
+
+
+  p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +y_0=-4480000 +ellps=GRS80 +units=m +no_defs"))
+              buf <- gBuffer(p, width = 2000, byid = T)
+              buf <- gUnion(buf, buf)
+    bufs$wtm <- disaggregate(buf)
+
+                  shapefile(bufs$wtm, "data/NAIPImages/MYSE_captures_2014_wtm.shp", overwrite = T)
 #+end_src
 
 #+RESULTS:
@@ -1323,7 +1317,7 @@ p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +
 ** read images and crop to 2km
 #+begin_src R
 
-  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}[_w]*.tif$")[19]
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}[_w]*.tif$")
 
   images <- lapply(image.files, function(image.file) stack(image.file))
 
@@ -1337,7 +1331,9 @@ p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +
   shapefile(poly.extents.merged, "data/NAIPImages/extents.shp", overwrite = T)
   projs <- sapply(images, function(i) proj4string(i))
 
-  cropped.images <- lapply(1:length(projs), function(i) {
+  #cropped.images <- lapply(1:length(projs), function(i) {
+
+  cropped.images <- lapply(19, function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
@@ -1352,7 +1348,8 @@ p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +
               }
           })
       }
-
+    
+  #utm16
       if(grepl(".*zone=16.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm16), function(j) {
               #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
@@ -1365,23 +1362,22 @@ p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +
               }
           })
       }
+    
+  #wtm
 
-          if(grepl(".*+x_0=520000 +y_0=-4480000 +ellps=GRS80.*", projs[i])) {
-          ci <- lapply(1:length(bufs$utm16), function(j) {
+      if(grepl(".*x_0=520000.*y_0=-4480000.*ellps=GRS80.*", projs[i])) {
+          ci <- lapply(1:length(bufs$wtm), function(j) {
               #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
               m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"/masked_",j,".tif")
-              if(gIntersects(poly.extents.merged[i,], bufs$utm16[j,])) {
-                  c1 <- crop(images[[i]], bufs$utm16[j,])   #, filename = c.out.path, overwrite = T)
-                  m1 <- mask(c1, bufs$utm16[j,]) #, filename = m.out.path, overwrite = T)
+              if(gIntersects(poly.extents.merged[i,], bufs$wtm[j,])) {
+                  c1 <- crop(images[[i]], bufs$wtm[j,])   #, filename = c.out.path, overwrite = T)
+                  m1 <- mask(c1, bufs$wtm[j,]) #, filename = m.out.path, overwrite = T)
                   t1 <- trim(m1) #, filename = m.out.path, overwrite = T)
                   writeRaster(t1, filename = m.out.path, overwrite = T, options = c("PHOTOMETRIC=RGB", "ALPHA=YES"), datatype = "INT1U")
               }
           })
       }
 
-
-
-    
   })
 #+end_src
 ** add some additional features/layers
