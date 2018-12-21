@@ -1644,7 +1644,8 @@ by an hour, so I'm going to just build one model for flambeau
 
                            img.features <- list.files(f.dir, full.names = T, recursive = T)
                            img.features <- str_extract(img.features, paste0(".*",img,"_.*")) %>% na.omit
-                         
+
+                           img.dir <- str_replace(paste0(f.dir,img), "masked_[0-9]+","")
                            st <- stack(list.files(img.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
 
                                           #                         to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
