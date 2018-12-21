@@ -1276,28 +1276,44 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 ** read points
 
 #+begin_src R
-    library(readxl)
-    library(sp)
-    library(rgeos)
-    library(maptools)
-    library(dplyr)
-    library(raster)
-library(stringr)
-    d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
-    coordinates(d) <- ~long + lat
-    proj4string(d) <- CRS("+init=epsg:4326")
+        library(readxl)
+        library(sp)
+        library(rgeos)
+        library(maptools)
+        library(dplyr)
+        library(raster)
+    library(stringr)
+        d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
+        coordinates(d) <- ~long + lat
+        proj4string(d) <- CRS("+init=epsg:4326")
 
-    utms <- c("15","16")
-    bufs <- lapply(utms, function(utm) {
-        p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
-        buf <- gBuffer(p, width = 2000, byid = T)
-        buf <- gUnion(buf, buf)
-        buf <- disaggregate(buf)
-        buf
-})
-names(bufs) <- c("utm15","utm16")
-shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
-shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
+        utms <- c("15","16")
+        bufs <- lapply(utms, function(utm) {
+            p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
+            buf <- gBuffer(p, width = 2000, byid = T)
+            buf <- gUnion(buf, buf)
+            buf <- disaggregate(buf)
+            buf
+    })
+
+
+    names(bufs) <- c("utm15","utm16")
+    shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
+    shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
+
+  
+p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +y_0=-4480000 +ellps=GRS80 +units=m +no_defs"))
+
+  bufs$wtm <- disaggregate(buf)
+
+            buf <- gBuffer(p, width = 2000, byid = T)
+            buf <- gUnion(buf, buf)
+            buf <- disaggregate(buf)
+            buf
+    })
+
+
+    shapefile(bufs$wtm, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
 #+end_src
 
 #+RESULTS:
