@@ -24,7 +24,8 @@
 |                        |                        |       | [2018-10-22 Mon] | I submitted 40 hours for the 10/4 - 10/26 pay period |
 | [2018-10-22 Mon 16:30] | [2018-10-22 Mon 17:00] |       |                  |                                                      |
 | [2018-12-18 Tue 11:00] | [2018-12-18 Tue 14:00] |       |                  |                                                      |
-| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu 15:00] | 2     |                  |                                                      |
+| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu 15:00] |       |                  |                                                      |
+| [2018-12-21 Fri 9:20]  | [2018-12-21 Fri    ]   |       |                  |                                                      |
 
 * libraries
 #+begin_src R
@@ -1300,18 +1301,13 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
 #+end_src
 
 #+RESULTS:
-: rgeos version: 0.3-23, (SVN revision 546)
-:  GEOS runtime version: 3.5.0-CAPI-1.9.0 r4084 
-:  Linking to sp version: 1.2-4 
-:  Polygon checking: TRUE
-: Checking rgeos availability: TRUE
 : Warning messages:
 : 1: Setting row names on a tibble is deprecated. 
 : 2: Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
 #+begin_src R
 
-  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}.tif$")[6:27]
+  image.files <- list.files("data/NAIPImages", recursive = T, full.names = T, pattern = ".*[0-9]{8}[_w]*.tif$")[19]
 
   images <- lapply(image.files, function(image.file) stack(image.file))
 
@@ -1353,6 +1349,23 @@ shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite 
               }
           })
       }
+
+          if(grepl(".*+x_0=520000 +y_0=-4480000 +ellps=GRS80.*", projs[i])) {
+          ci <- lapply(1:length(bufs$utm16), function(j) {
+              #c.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"_cropped_",j,".tif")
+              m.out.path <- paste0(tools::file_path_sans_ext(image.files[i]),"/masked_",j,".tif")
+              if(gIntersects(poly.extents.merged[i,], bufs$utm16[j,])) {
+                  c1 <- crop(images[[i]], bufs$utm16[j,])   #, filename = c.out.path, overwrite = T)
+                  m1 <- mask(c1, bufs$utm16[j,]) #, filename = m.out.path, overwrite = T)
+                  t1 <- trim(m1) #, filename = m.out.path, overwrite = T)
+                  writeRaster(t1, filename = m.out.path, overwrite = T, options = c("PHOTOMETRIC=RGB", "ALPHA=YES"), datatype = "INT1U")
+              }
+          })
+      }
+
+
+
+    
   })
 #+end_src
 ** add some additional features/layers
