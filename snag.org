@@ -26,6 +26,7 @@
 | [2018-12-18 Tue 11:00] | [2018-12-18 Tue 14:00] |       |                  |                                                      |
 | [2018-12-20 Thu 9:00]  | [2018-12-20 Thu 15:00] |       |                  |                                                      |
 | [2018-12-21 Fri 9:20]  | [2018-12-21 Fri 13:00] |       |                  |                                                      |
+|                        |                        |       |                  |                                                      |
 
 * libraries
 #+begin_src R
@@ -1665,7 +1666,6 @@ by an hour, so I'm going to just build one model for flambeau
 
 
 #+end_src
-
 
 ** NHAL
 NHAL is all in the same flightline.
