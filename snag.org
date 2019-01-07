@@ -1681,7 +1681,7 @@ NHAL is all in the same flightline.
 
       ext_ID <- do.call("bind", train.imgs)
 
-      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_12_.*.tif$")  #I changed it number to be "12", because the sw tile has both "11" and "12"
 
       train.stack <- stack(f)
 
