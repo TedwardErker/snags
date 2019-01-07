@@ -1761,19 +1761,17 @@ on the whole naip tile, not the masked image.  So the number of rows
 is off.  I need to crop them..........
 
 #+begin_src R
-      f.dir <- "data/NAIPImages/Sandhill2013/"
-      r.tocrop <- lapply(list.files(f.dir, full.names = T, pattern = ".*m_4409047_ne_15_1_20130701_masked_.*"), function(f) {
-          r <- raster(f)
-          crop(r, extent(r, 724, 7750, 1, 5850), filename = f, overwrite = T)
-  })
-#7027
-#7750
+        f.dir <- "data/NAIPImages/Sandhill2013/"
+        r.tocrop <- lapply(list.files(f.dir, full.names = T, pattern = ".*m_4409047_ne_15_1_20130701_masked_.*"), function(f) {
+            r <- raster(f)
+            fo <- paste0(tools::file_path_sans_ext(f), "_c.tif")
+            crop(r, extent(r, 724, 7750, 1, 5850), filename = fo, overwrite = T)
+    })
+  #7027
+  #7750
 #+end_src
 
 #+RESULTS:
-: Error in .local(.Object, ...) : 
-:   `/home/erker/snag/data/NAIPImages/Sandhill2013/m_4409047_ne_15_1_20130701_masked_livetrees.tif' does not exist in the file system,
-: and is not recognised as a supported dataset name.
 
 
 All of these are also in the same flightline
@@ -1784,7 +1782,7 @@ All of these are also in the same flightline
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-  lapply(imgs[2], function(img) {
+  lapply(imgs, function(img) {
 
       train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
 
@@ -1808,7 +1806,7 @@ All of these are also in the same flightline
 
       l <- split(nl, rep(1:divide, each = length(nl) / divide))
 
-      for (i = 1:divide) {
+      for (i in 1:divide) {
           fn <- paste0(f.dir,img, "_",i,".ffdata")
 
           mat <- ff(vmode="integer",dim=c(ncell(train.stack),length(nl) / divide),filename=fn)
@@ -1820,17 +1818,18 @@ All of these are also in the same flightline
           extracted.values <- mat[ext_ID$cell,]
 
           df <- data.frame(extracted.values)
-          colnames(df) <- names(train.stack)
+          colnames(df) <- names(train.stack)[((i-1)*36 + 1:36)]
 
           df$Class <- factor(ext_ID$Class)
-        
-          save(df,file=paste0(f.dir,img, "_",i,"_train.RData"))
+
+          saveRDS(df,file=paste0(f.dir,img, "_",i,"_train.rds"))
       }
+
+      df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.RData"), full.names = T) 
+      df <- do.call("cbind", df.s)
     
-      list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.RData"))
-          cbind
       saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
-        
+
   })
 
 
