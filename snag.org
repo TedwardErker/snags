@@ -1825,7 +1825,8 @@ All of these are also in the same flightline
           saveRDS(df,file=paste0(f.dir,img, "_",i,"_train.rds"))
       }
 
-      df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.RData"), full.names = T) 
+      df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.rds"), full.names = T)
+      df.s <- lapply(df.s, readRDS)
       df <- do.call("cbind", df.s)
     
       saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
