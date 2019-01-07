@@ -1,9 +1,9 @@
 #+TITLE:Classify Snags
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
-##+PROPERTY: header-args:R :session *R:snag:krusty* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
@@ -11,23 +11,27 @@
 ------------
 
 * hours
-| in                     | out                    | hours |                  |                                                      |
-|------------------------+------------------------+-------+------------------+------------------------------------------------------|
-|                        |                        |    40 | previously       |                                                      |
-| [2018-09-20 Thu 10:30] | [2018-09-20 Thu 11:20] |  .875 |                  |                                                      |
-| [2018-09-21 Fri 10:00] | [2018-09-21 Fri 11:00] |     1 |                  |                                                      |
-| [2018-09-25 Tue 9:30]  | [2018-09-25 Tue 10:30] |     1 |                  |                                                      |
-| [2018-09-27 Thu 9:00]  | [2018-09-27 Thu 10:00] |     1 |                  |                                                      |
-| [2018-09-28 Fri 9:00]  | [2018-09-28 Fri 12:00] |     3 |                  |                                                      |
-| [2018-10-02 Tue 10:00] | [2018-10-02 Tue 11:00] |     1 |                  |                                                      |
-| [2018-10-03 Wed 10:00] | [2018-10-03 Wed 14:00] |     4 |                  |                                                      |
-| [2018-10-04 Thu 8:30]  | [2018-10-04 Thu 11:30] |     3 |                  |                                                      |
-|                        |                        |       | [2018-10-22 Mon] | I submitted 40 hours for the 10/4 - 10/26 pay period |
-| [2018-10-22 Mon 16:30] | [2018-10-22 Mon 17:00] |       |                  |                                                      |
-| [2018-12-18 Tue 11:00] | [2018-12-18 Tue 14:00] |       |                  |                                                      |
-| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu 15:00] |       |                  |                                                      |
-| [2018-12-21 Fri 9:20]  | [2018-12-21 Fri 13:00] |       |                  |                                                      |
-| [2019-01-04 Fri 12:00] | [2019-01-04 Fri ]      |       |                  |                                                      |
+| in                     | out                    | hours |                  |                                                                                 |
+|------------------------+------------------------+-------+------------------+---------------------------------------------------------------------------------|
+|                        |                        |    40 | previously       |                                                                                 |
+| [2018-09-20 Thu 10:30] | [2018-09-20 Thu 11:20] |  .875 |                  |                                                                                 |
+| [2018-09-21 Fri 10:00] | [2018-09-21 Fri 11:00] |     1 |                  |                                                                                 |
+| [2018-09-25 Tue 9:30]  | [2018-09-25 Tue 10:30] |     1 |                  |                                                                                 |
+| [2018-09-27 Thu 9:00]  | [2018-09-27 Thu 10:00] |     1 |                  |                                                                                 |
+| [2018-09-28 Fri 9:00]  | [2018-09-28 Fri 12:00] |     3 |                  |                                                                                 |
+| [2018-10-02 Tue 10:00] | [2018-10-02 Tue 11:00] |     1 |                  |                                                                                 |
+| [2018-10-03 Wed 10:00] | [2018-10-03 Wed 14:00] |     4 |                  |                                                                                 |
+| [2018-10-04 Thu 8:30]  | [2018-10-04 Thu 11:30] |     3 |                  |                                                                                 |
+|                        |                        |       | [2018-10-22 Mon] | I submitted 40 hours for the 10/4 - 10/26 pay period                            |
+|                        |                        |       |                  | I'm only supposed to submit 20/week, so they canceled out the extra hours I had |
+| [2018-10-22 Mon 16:30] | [2018-10-22 Mon 17:00] |    .5 |                  |                                                                                 |
+| [2018-12-18 Tue 11:00] | [2018-12-18 Tue 14:00] |     3 |                  |                                                                                 |
+| [2018-12-20 Thu 9:00]  | [2018-12-20 Thu 15:00] |     6 |                  |                                                                                 |
+| [2018-12-21 Fri 9:20]  | [2018-12-21 Fri 13:00] |   3.6 |                  |                                                                                 |
+| [2019-01-04 Fri 12:00] | [2019-01-04 Fri 14:00] |     2 |                  |                                                                                 |
+|                        |                        |       | [2019-01-07 Mon] | I submitted 20 hours for the 12/23 - 1/5 period                                 |
+|                        |                        |       | [2019-01-07 Mon] | I submitted 20 hours for the 1/6 - 1/19 period                                  |
+| [2019-01-07 Mon 9:00]  |                        |       |                  |                                                                                 |
 
 * libraries
 #+begin_src R
@@ -1645,7 +1649,7 @@ by an hour, so I'm going to just build one model for flambeau
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
                            img.features <- list.files(f.dir, full.names = T, recursive = T)
-                           img.features <- str_extract(img.features, paste0(".*",img,"_.*")) %>% na.omit
+                           img.features <- str_extract(img.features, paste0(".*",img,"_.*")) %>% na.omit  #potential problem if existig predicted tiles are in the directory
 
                            img.dir <- str_replace(paste0(f.dir,img), "masked_[0-9]+","")
                            st <- stack(list.files(img.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
