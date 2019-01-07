@@ -1781,27 +1781,37 @@ All of these are also in the same flightline
 
       train.stack <- stack(f)
 
-      fn <- paste0(f.dir,img, ".ffdata")
+      nl <- 1:nlayers(train.stack)
 
-      mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
-                                          #
-                                          #
-  ### if data is too big for ff, need fewer layers or smaller training images!!! argggggg!!!
+      divide <- 4
 
-      for(i in 1:nlayers(train.stack)){
-          mat[,i] <- train.stack[[i]][]
+      l <- split(nl, rep(1:divide, each = length(nl) / divide))
+
+      for (i = 1:divide) {
+          fn <- paste0(f.dir,img, "_",i,".ffdata")
+
+          mat <- ff(vmode="integer",dim=c(ncell(train.stack),length(nl) / divide),filename=fn)
+
+          l <- split(nl, rep(1:4, each = 36))
+        
+          for(j in l[[i]]){
+              mat[,j] <- train.stack[[j]][]
+          }
+
+          extracted.values <- mat[ext_ID$cell,]
+
+          df <- data.frame(extracted.values)
+          colnames(df) <- names(train.stack)
+
+          df$Class <- factor(ext_ID$Class)
+        
+          save(df,file=paste0(f.dir,img, "_",i,"_train.RData"))
       }
-
-      save(mat,file=paste0(f.dir,img, "_train.RData"))
-
-      extracted.values <- mat[ext_ID$cell,]
-
-      df <- data.frame(extracted.values)
-      colnames(df) <- names(train.stack)
-
-      df$Class <- factor(ext_ID$Class)
-
+    
+      list.files(
+          cbind
       saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
+        
   })
 
 
