@@ -1,9 +1,9 @@
 #+TITLE:Classify Snags
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
-##+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
@@ -1782,7 +1782,7 @@ All of these are also in the same flightline
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-  lapply(imgs, function(img) {
+  lapply(imgs[2], function(img) {
 
       train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
 
@@ -1828,7 +1828,7 @@ All of these are also in the same flightline
       df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.rds"), full.names = T)
       df.s <- lapply(df.s, readRDS)
       df <- do.call("cbind", df.s)
-    
+
       saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
 
   })
@@ -1838,6 +1838,9 @@ All of these are also in the same flightline
 
   dfs <- lapply(dfs, readRDS)
 
+                                          # drop the duplicate "Class" columns
+  dfs <- lapply(dfs, function(x) x[,-c(37,74,111)])
+
   for(i in 1:length(dfs)) {
       colnames(dfs[[i]])[1:(length(colnames(dfs[[i]]))-1)] <- str_match(colnames(dfs[[i]]), "^(masked_[0-9]+_)(.*)")[,3][1:(length(colnames(dfs[[i]]))-1)]
   }
@@ -1845,7 +1848,12 @@ All of these are also in the same flightline
   df <- do.call("rbind", dfs)
 
   df <- df %>% na.omit()
-  mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+
+    df.s <- filter(df, Class == "snag")
+    df.allelse <- filter(df, Class != "snag")
+    df.sub <- sample_n(df.allelse, 350000)
+    df.sub <- rbind(df.s, df.sub)
+  mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
   saveRDS(mod, paste0(f.dir, "mod.rds"))
 
