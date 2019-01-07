@@ -2,7 +2,8 @@
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
 ##+PROPERTY: header-args:R :session *R:snag:krusty* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
