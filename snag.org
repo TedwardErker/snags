@@ -1719,7 +1719,7 @@ by an hour, so I'm going to just build one model for flambeau
 
   df.s <- filter(df, Class == "snag")
   df.allelse <- filter(df, Class != "snag")
-  df.sub <- sample_n(df.allelse, 350000)
+  df.sub <- sample_n(df.allelse, 10000)
   df.sub <- rbind(df.s, df.sub)
 
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
@@ -1747,7 +1747,8 @@ by an hour, so I'm going to just build one model for flambeau
 
                            names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
 
-                           pred.r <- raster::predict(st, mod, filename = paste0(f.dir,img, "_predicted.tif"), overwrite = T, datatype = "INT1U")
+                           pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
+                           pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
 
                        }
 #+end_src
@@ -1942,7 +1943,7 @@ All of these are also in the same flightline
 
     df.s <- filter(df, Class == "snag")
     df.allelse <- filter(df, Class != "snag")
-    df.sub <- sample_n(df.allelse, 350000)
+    df.sub <- sample_n(df.allelse, 10000)
     df.sub <- rbind(df.s, df.sub)
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
@@ -1971,7 +1972,8 @@ All of these are also in the same flightline
 
                            names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
 
-                           pred.r <- raster::predict(st, mod, filename = paste0(f.dir,img, "_predicted.tif"), overwrite = T, datatype = "INT1U")
+                           pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
+                           pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
 
                        }
 
