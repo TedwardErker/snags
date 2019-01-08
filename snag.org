@@ -1719,7 +1719,7 @@ by an hour, so I'm going to just build one model for flambeau
 
   df.s <- filter(df, Class == "snag")
   df.allelse <- filter(df, Class != "snag")
-  df.sub <- sample_n(df.allelse, 10000)
+  df.sub <- sample_n(df.allelse, 350000)
   df.sub <- rbind(df.s, df.sub)
 
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
@@ -1943,7 +1943,7 @@ All of these are also in the same flightline
 
     df.s <- filter(df, Class == "snag")
     df.allelse <- filter(df, Class != "snag")
-    df.sub <- sample_n(df.allelse, 10000)
+    df.sub <- sample_n(df.allelse, 350000)
     df.sub <- rbind(df.s, df.sub)
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
