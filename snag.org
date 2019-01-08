@@ -1550,16 +1550,14 @@ library(tidyr)
 
       df.s <- filter(df, Class == "snag")
       df.allelse <- filter(df, Class != "snag")
-      df.sub <- sample_n(df.allelse, 350000)
+      df.sub <- sample_n(df.allelse, 3000)
       df.sub <- rbind(df.s, df.sub)
       mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
-      saveRDS(mod, paste0(f.dir, "mod.rds"))
-
-
+      saveRDS(mod, paste0(f.dir, date, "_mod.rds"))
 
       imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
-      imgs <- str_extract(imgs, "m_[0-9]{7}.*/masked_[0-9]+")
+      imgs <- str_extract(imgs, paste0("m_[0-9]{7}.*",date,"/masked_[0-9]+")) %>% na.omit()
 
       cores <- length(imgs)
 
@@ -1583,12 +1581,9 @@ library(tidyr)
                                pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
 
                            }
+      })
 
 #+end_src
-
-#+RESULTS:
-: Error in ff(vmode = "integer", dim = c(ncell(train.stack), nlayers(train.stack)),  : 
-:   length exceeds file length
 
 ** FlambeauRiver
 The dates are so close together and the time of day is only different
