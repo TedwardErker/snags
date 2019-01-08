@@ -1550,90 +1550,119 @@ library(tidyr)
 ** Black River training data, Build model, and predict onto cropped images
 
 #+begin_src R
-    dates <- c("20130705","20130813")
-  #  dates <- c("20130813")
+  dates <- c("20130705","20130813")
 
-                                            # for date in dates for which we have training data....
-    lapply(dates, function(date) {
-        tile.dirs <- list.dirs("data/NAIPImages/")
+                                          # for date in dates for which we have training data....
+  lapply(dates, function(date) {
 
-        tile.dirs <- tile.dirs[grepl(paste0(".*",date), tile.dirs)]
+      f.dir <- "data/NAIPImages/BlackRiverSF2013/"
 
-        lapply(tile.dirs, function(tile.dir) {
+      imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*.tif$") %>% na.omit()
 
-            train.date.imgs <- paste0(tile.dir, "_",c("liveveg","livetrees","other","snag"),"_masked.tif")
-            if(file.exists(train.date.imgs[1])) {
-                train.date.imgs <- lapply(train.date.imgs, raster)
+      imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-                train.date.imgs <- lapply(train.date.imgs, function(r) {
-                    cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
-                    cells <- which(getValues(r > 0))
-                    df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
-                })
+      lapply(imgs, function(img) {
 
-                ext_ID <- do.call("bind", train.date.imgs)
+          train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
 
-                f <- list.files(tile.dir, full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+          train.imgs <- lapply(train.imgs, raster)
 
-                train.stack <- stack(f)
+          train.imgs <- lapply(train.imgs, function(r) {
+              cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+              cells <- which(as.boolean(getValues(r > 0)))
+              df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+          })
 
-                fn <- paste0(tile.dir, ".ffdata")
+          ext_ID <- do.call("bind", train.imgs)
 
-                mat <- ff(vmode="integer",dim=c(ncell(train.stack),nlayers(train.stack)),filename=fn)
-                                          #
-                                          #
-                                          #
-                                          #
-  ### We have a PROBLEM.  DATA is too big for FF OBJECTS!
-# need fewer layers or smaller training images!!! argggggg!!!
-                ####
-                #mat <- ff(vmode="integer",dim=c(6002410, 140), filename=fn)
+          f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_[0-9]+_.*.tif$")
 
-                for(i in 1:nlayers(train.stack)){
-                    mat[,i] <- train.stack[[i]][]
-                }
+          train.stack <- stack(f)
 
-                save(mat,file=paste0(tile.dir, "_train.RData"))
+          nl <- 1:nlayers(train.stack)
 
-                extracted.values <- mat[ext_ID$cell,]
+          divide <- 4
 
-                df <- data.frame(extracted.values)
-                colnames(df) <- names(train.stack)
+          l <- split(nl, rep(1:divide, each = length(nl) / divide))
 
-                df$Class <- factor(ext_ID$Class)
+          for (i in 1:divide) {
+              fn <- paste0(f.dir,img, "_",i,".ffdata")
 
-                saveRDS(df, paste0(tile.dir, "_model_building_df.rds"))
-            }
-        })
+              mat <- ff(vmode="integer",dim=c(ncell(train.stack),length(nl) / divide),filename=fn)
 
-        dfs <- list.files("data/NAIPImages", pattern = paste0(".*",date,"_model_building_df.rds"), full.names = T, recursive = T)
+              for(j in 1:36){
+                  mat[,j] <- train.stack[[((i-1)*36 + j)]][]   # need to fix index in mat......  1:36
+              }
 
-        dfs <- lapply(dfs, readRDS)
+              extracted.values <- mat[ext_ID$cell,]
 
-        df <- do.call("rbind", dfs)
+              df <- data.frame(extracted.values)
+              colnames(df) <- names(train.stack)[((i-1)*36 + 1:36)]
 
-        df <- df %>% na.omit()
-        mod <- randomForest(y = factor(df$Class), x= df[,1:(dim(df)[2]-1)])
+              df$Class <- factor(ext_ID$Class)
+
+              saveRDS(df,file=paste0(f.dir,img, "_",i,"_train.rds"))
+          }
+
+          df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.rds"), full.names = T)
+          df.s <- lapply(df.s, readRDS)
+          df <- do.call("cbind", df.s)
+
+          saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
+
+      })
 
 
-        cores <- length(tile.dirs)
+      dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.rds"), full.names = T, recursive = T)
 
-        cl <- makeCluster(cores)
-        registerDoParallel(cl)
+      dfs <- lapply(dfs, readRDS)
 
-        features <- foreach (tile.dir = tile.dirs,
-                             .packages = c("raster","stringr","randomForest")) %dopar% {
+                                          # drop the duplicate "Class" columns
+      dfs <- lapply(dfs, function(x) x[,-c(37,74,111)])
 
-                                 st <- stack(list.files(tile.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
+      for(i in 1:length(dfs)) {
+          colnames(dfs[[i]])[1:(length(colnames(dfs[[i]]))-1)] <- str_match(colnames(dfs[[i]]), "^(masked_[0-9]+_)(.*)")[,3][1:(length(colnames(dfs[[i]]))-1)]
+      }
 
-                                 to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
-                                 names(st) <- str_replace(names(st), "masked_[0-9]+_", to_replace)
+      df <- do.call("rbind", dfs)
 
-                                 pred.r <- raster::predict(st, mod, filename = paste0(tile.dir, "_predicted.tif"), overwrite = T, datatype = "INT1U")
+      df <- df %>% na.omit()
 
-                             }
+      df.s <- filter(df, Class == "snag")
+      df.allelse <- filter(df, Class != "snag")
+      df.sub <- sample_n(df.allelse, 350000)
+      df.sub <- rbind(df.s, df.sub)
+      mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
-    })
+      saveRDS(mod, paste0(f.dir, "mod.rds"))
+
+
+
+      imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
+      imgs <- str_extract(imgs, "m_[0-9]{7}.*/masked_[0-9]+")
+
+      cores <- length(imgs)
+
+      cl <- makeCluster(cores)
+      registerDoParallel(cl)
+
+      features <- foreach (img = imgs,
+                           .packages = c("raster","stringr","randomForest")) %dopar% {
+
+                               img.features <- list.files(f.dir, full.names = T, recursive = T)
+                               img.features <- str_extract(img.features, paste0(".*",img,"_.*")) %>% na.omit  #potential problem if existig predicted tiles are in the directory
+
+                               img.dir <- str_replace(paste0(f.dir,img), "masked_[0-9]+","")
+                               st <- stack(list.files(img.dir, full.names = T, pattern = ".*_[0-9]+_.*.tif$"))
+
+                                          #                         to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
+
+                               names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
+
+                               pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
+                               pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
+
+                           }
 
 #+end_src
 
@@ -1974,7 +2003,7 @@ All of these are also in the same flightline
 
                            pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
                            pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
- c
+ 
                        }
 
 
