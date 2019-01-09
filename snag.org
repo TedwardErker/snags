@@ -1511,7 +1511,7 @@ library(tidyr)
               mat <- ff(vmode="integer",dim=c(ncell(train.stack),length(nl) / divide),filename=fn)
 
               for(j in 1:36){
-                  mat[,j] <- train.stack[[((i-1)*36 + j)]][]   # need to fix index in mat......  1:36
+                  mat[,j] <- train.stack[[((i-1)*36 + j)]][]  
               }
 
               extracted.values <- mat[ext_ID$cell,]
