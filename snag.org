@@ -1321,6 +1321,8 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 : Warning messages:
 : 1: Setting row names on a tibble is deprecated. 
 : 2: Setting row names on a tibble is deprecated.
+: Warning message:
+: Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
 #+begin_src R
 
@@ -1340,7 +1342,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
   #cropped.images <- lapply(1:length(projs), function(i) {
 
-  cropped.images <- lapply(19, function(i) {
+  cropped.images <- lapply(c(19,21,23), function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
@@ -1355,7 +1357,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
               }
           })
       }
-    
+
   #utm16
       if(grepl(".*zone=16.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm16), function(j) {
@@ -1369,7 +1371,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
               }
           })
       }
-    
+
   #wtm
 
       if(grepl(".*x_0=520000.*y_0=-4480000.*ellps=GRS80.*", projs[i])) {
