@@ -1471,6 +1471,7 @@ library(tidyr)
 
 #+begin_src R
   dates <- c("20130705","20130813")
+  dates <- c("20130813")
 
                                           # for date in dates for which we have training data....
   lapply(dates, function(date) {
@@ -1548,10 +1549,13 @@ library(tidyr)
 
       df <- df %>% na.omit()
 
-      df.s <- filter(df, Class == "snag")
-      df.allelse <- filter(df, Class != "snag")
-      df.sub <- sample_n(df.allelse, 300000)
-      df.sub <- rbind(df.s, df.sub)
+    #  df.s <- filter(df, Class == "snag")
+     # df.allelse <- filter(df, Class != "snag")
+      #df.sub <- sample_n(df.allelse, 300000)
+      #df.sub <- rbind(df.s, df.sub)
+
+      df.sub <- df
+
       mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
       saveRDS(mod, paste0(f.dir, date, "_mod.rds"))
