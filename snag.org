@@ -1550,7 +1550,7 @@ library(tidyr)
 
       df.s <- filter(df, Class == "snag")
       df.allelse <- filter(df, Class != "snag")
-      df.sub <- sample_n(df.allelse, 3000)
+      df.sub <- sample_n(df.allelse, 300000)
       df.sub <- rbind(df.s, df.sub)
       mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
