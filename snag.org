@@ -1396,7 +1396,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[c(19,21,23)], function(tile.dir) {
+    lapply(tile.dirs[c(19)], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
@@ -1412,61 +1412,61 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
 
 #+begin_src R
-library(tidyr)
+  library(tidyr)
 
   cores <- 40
 
-  tile.dirs <- list.dirs("data/NAIPImages/")
-  tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
+    tile.dirs <- list.dirs("data/NAIPImages/")
+    tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-  tile.dirs <- tile.dirs[2:length(tile.dirs)]
+    tile.dirs <- tile.dirs[2:length(tile.dirs)]
 
-    lapply(tile.dirs, function(tile.dir) {
-        tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
+      lapply(tile.dirs[18], function(tile.dir) {
+          tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
-        lapply(tile.names, function(tile.name) {
-            cl <- makeCluster(cores)
-            registerDoParallel(cl)
+          lapply(tile.names, function(tile.name) {
+              cl <- makeCluster(cores)
+              registerDoParallel(cl)
 
 
-            focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
-            focal.fun <- c("mean","max","min")
-            focal.window.diameter <- c(1,2,4,8,11)
-            names <- remove.tif.ext(list.files(tile.dir, paste0(tile.name,focal.feature.pattern)))
-            focal.param.df <- expand.grid(raster.dir = tile.dir,
-                                          raster.name = names,
-                                          fun = focal.fun,
-                                          window.diameter = focal.window.diameter,
-                                          stringsAsFactors = F)
+              focal.feature.pattern = "_(blue|green|red|nir|ratio.blue|ratio.green|ratio.red|ratio.nir|ndvi).tif$"
+              focal.fun <- c("mean","max","min")
+              focal.window.diameter <- c(1,2,4,8,11)
+              names <- remove.tif.ext(list.files(tile.dir, paste0(tile.name,focal.feature.pattern)))
+              focal.param.df <- expand.grid(raster.dir = tile.dir,
+                                            raster.name = names,
+                                            fun = focal.fun,
+                                            window.diameter = focal.window.diameter,
+                                            stringsAsFactors = F)
 
-                                            # only generating the top additional features
+                                              # only generating the top additional features
 
-            funs <- str_match(as.character(top$name), "fun.([a-z]+)")[,2] %>% na.omit()
-            windows <-str_match(as.character(top$name), "windowcircle.([0-9]+)")[,2] %>% as.numeric() %>% na.omit()
-            names <- str_match(as.character(top$name), "X(_[a-z]+.[a-z]+)_window")[,2] %>% na.omit()
-            names <- paste0(tile.name, names)
+              funs <- str_match(as.character(top$name), "fun.([a-z]+)")[,2] %>% na.omit()
+              windows <-str_match(as.character(top$name), "windowcircle.([0-9]+)")[,2] %>% as.numeric() %>% na.omit()
+              names <- str_match(as.character(top$name), "X(_[a-z]+.[a-z]+)_window")[,2] %>% na.omit()
+              names <- paste0(tile.name, names)
 
-            top.focal.param.df <- data.frame(raster.dir = tile.dir,
-                                         raster.name = names,
-                                         fun = funs,
-                                         window.diameter = windows,
-                                         stringsAsFactors = F)
+              top.focal.param.df <- data.frame(raster.dir = tile.dir,
+                                           raster.name = names,
+                                           fun = funs,
+                                           window.diameter = windows,
+                                           stringsAsFactors = F)
 
-            fpdf <- focal.param.df %>% unite(com, raster.name, fun, window.diameter)
-            tfpdf <- top.focal.param.df %>% unite(com, raster.name, fun, window.diameter)
+              fpdf <- focal.param.df %>% unite(com, raster.name, fun, window.diameter)
+              tfpdf <- top.focal.param.df %>% unite(com, raster.name, fun, window.diameter)
 
-            focal.param.df <- focal.param.df[!fpdf$com %in% tfpdf$com,]
+              focal.param.df <- focal.param.df[!fpdf$com %in% tfpdf$com,]
 
-            features <- foreach (i = 1:nrow(focal.param.df),
-                                 .packages = c("raster","stringr"),
-                                 .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %dopar% {
+              features <- foreach (i = 1:nrow(focal.param.df),
+                                   .packages = c("raster","stringr"),
+                                   .export = c('make.focal.features','focal.name.and.writeRaster','myfocalWeight','circular.weight')) %dopar% {
 
-                                     make.focal.features(focal.param.df[i,])
-                                 }
+                                       make.focal.features(focal.param.df[i,])
+                                   }
 
-            closeAllConnections()
-        })
-    })
+              closeAllConnections()
+          })
+      })
 #+end_src
 
 ** Black River training data, Build model, and predict onto cropped images
@@ -1801,7 +1801,7 @@ NHAL is all in the same flightline.
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
-  features <- foreach (img = imgs,
+  features <- foreach (img = imgs[c(3,4)],
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
 
