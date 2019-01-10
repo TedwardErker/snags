@@ -1780,10 +1780,13 @@ NHAL is all in the same flightline.
 
   df <- df %>% na.omit()
 
-    df.s <- filter(df, Class == "snag")
-    df.allelse <- filter(df, Class != "snag")
-    df.sub <- sample_n(df.allelse, 350000)
-    df.sub <- rbind(df.s, df.sub)
+    #df.s <- filter(df, Class == "snag")
+    #df.allelse <- filter(df, Class != "snag")
+   # df.sub <- sample_n(df.allelse, 350000)
+  #df.sub <- rbind(df.s, df.sub)
+
+  df.sub <- df
+
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
   saveRDS(mod, paste0(f.dir, "mod.rds"))
