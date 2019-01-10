@@ -1727,7 +1727,7 @@ NHAL is all in the same flightline.
 
       ext_ID <- do.call("bind", train.imgs)
 
-      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_12_.*.tif$")  #I changed the number to 12 because there iis also an "11" for this tile
 
       train.stack <- stack(f)
 
@@ -1813,7 +1813,7 @@ NHAL is all in the same flightline.
 
                            pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
                            pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
- 
+
                        }
 #+end_src
 
