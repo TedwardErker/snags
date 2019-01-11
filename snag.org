@@ -3,8 +3,8 @@
 #+email: erker@wisc.edu
 ##+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
-##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
+###+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=black, citecolor=black, urlcolor=black}
@@ -32,7 +32,11 @@
 | [2019-01-04 Fri 12:00] | [2019-01-04 Fri 14:00] |     2 |                  |                                                                                 |
 |                        |                        |       | [2019-01-07 Mon] | I submitted 20 hours for the 12/23 - 1/5 period                                 |
 |                        |                        |       | [2019-01-07 Mon] | I submitted 20 hours for the 1/6 - 1/19 period                                  |
-| [2019-01-07 Mon 9:00]  |                        |       |                  |                                                                                 |
+| [2019-01-07 Mon 9:00]  | [2019-01-07 Mon 14:00] |       |                  |                                                                                 |
+|                        |                        |       |                  |                                                                                 |
+| [2019-01-10 Thu 9:00]  | [2019-01-10 Thu 14:00] |       |                  |                                                                                 |
+| [2019-01-11 Fri 10:00] |                        |       |                  |                                                                                 |
+|                        |                        |       |                  |                                                                                 |
 
 * libraries
 #+begin_src R
@@ -1801,7 +1805,7 @@ NHAL is all in the same flightline.
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
-  features <- foreach (img = imgs[c(3,4)],
+  features <- foreach (img = imgs[c(6)],
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
                            img.features <- list.files(f.dir, full.names = T, recursive = T)
@@ -1845,11 +1849,11 @@ All of these are also in the same flightline
 #+begin_src R
   f.dir <- "data/NAIPImages/Sandhill2013/"
 
-  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*.tif$") %>% na.omit()
+  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked_(livetrees|liveveg|other|snag).*.tif$") %>% na.omit()
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-  lapply(imgs, function(img) {
+  lapply(imgs[2], function(img) {
 
       train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
 
@@ -1918,7 +1922,7 @@ All of these are also in the same flightline
 
     df.s <- filter(df, Class == "snag")
     df.allelse <- filter(df, Class != "snag")
-    df.sub <- sample_n(df.allelse, 350000)
+    df.sub <- sample_n(df.allelse, 800000)
     df.sub <- rbind(df.s, df.sub)
   mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
@@ -1949,7 +1953,7 @@ All of these are also in the same flightline
 
                            pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
                            pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
- 
+
                        }
 
 
