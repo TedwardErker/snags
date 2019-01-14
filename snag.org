@@ -1601,11 +1601,11 @@ by an hour, so I'm going to just build one model for flambeau
 #+begin_src R
   f.dir <- "data/NAIPImages/FlambeauRiverSF2014/"
 
-  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*.tif$") %>% na.omit()
+  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-  lapply(imgs, function(img) {
+  lapply(imgs[c(2,3)], function(img) {
 
       train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
 
