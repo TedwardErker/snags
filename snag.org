@@ -1713,11 +1713,11 @@ NHAL is all in the same flightline.
   f.dir <- "data/NAIPImages/NHAL2013/"
 
 
-  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*.tif$") %>% na.omit()
+  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-  lapply(imgs[1], function(img) {
+  lapply(imgs[3], function(img) {
 
       train.imgs <- list.files(f.dir, paste0(img, "_masked.*(livetrees|liveveg|other|snag).*.tif$"), full.names = T)
 
@@ -1731,7 +1731,7 @@ NHAL is all in the same flightline.
 
       ext_ID <- do.call("bind", train.imgs)
 
-      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_12_.*.tif$")  #I changed the number to 12 because there iis also an "11" for this tile
+      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_11_.*.tif$")  #I changed the number to 12 because there iis also an "11" for this tile
 
       train.stack <- stack(f)
 
