@@ -51,6 +51,87 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
+#+begin_example
+Loading required package: sp
+Loading required package: bit
+Attaching package bit
+package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
+creators: bit bitwhich
+coercion: as.logical as.integer as.bit as.bitwhich which
+operator: ! & | xor != ==
+querying: print length any all min max range sum summary
+bit access: length<- [ [<- [[ [[<-
+for more help type ?bit
+
+Attaching package: ‘bit’
+
+The following object is masked from ‘package:base’:
+
+    xor
+
+Attaching package ff
+- getOption("fftempdir")=="/tmp/RtmpnZ0zLL"
+
+- getOption("ffextension")=="ff"
+
+- getOption("ffdrop")==TRUE
+
+- getOption("fffinonexit")==TRUE
+
+- getOption("ffpagesize")==65536
+
+- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
+
+- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
+
+- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
+
+
+Attaching package: ‘ff’
+
+The following objects are masked from ‘package:bit’:
+
+    clone, clone.default, clone.list
+
+The following objects are masked from ‘package:raster’:
+
+    filename, is.factor, ncol<-, nrow<-
+
+The following objects are masked from ‘package:utils’:
+
+    write.csv, write.csv2
+
+The following objects are masked from ‘package:base’:
+
+    is.factor, is.ordered
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:raster’:
+
+    intersect, select, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+randomForest 4.6-12
+Type rfNews() to see new features/changes/bug fixes.
+
+Attaching package: ‘randomForest’
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+Loading required package: foreach
+foreach: simple, scalable parallel programming from Revolution Analytics
+Use Revolution R for scalability, fault tolerance and more.
+http://www.revolutionanalytics.com
+Loading required package: iterators
+#+end_example
 
 * bits
 ** texture params
@@ -1731,7 +1812,7 @@ NHAL is all in the same flightline.
 
       ext_ID <- do.call("bind", train.imgs)
 
-      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_11_.*.tif$")  #I changed the number to 12 because there iis also an "11" for this tile
+      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_11_.*.tif$")  # I changed this to 11 for 60_nw;  I changed the number to 12 because there iis also an "11" for this tile
 
       train.stack <- stack(f)
 
@@ -1805,7 +1886,7 @@ NHAL is all in the same flightline.
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
-  features <- foreach (img = imgs[c(6)],
+  features <- foreach (img = imgs[-c(6)],
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
                            img.features <- list.files(f.dir, full.names = T, recursive = T)
