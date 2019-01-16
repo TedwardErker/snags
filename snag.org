@@ -1506,7 +1506,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
     tile.dirs <- tile.dirs[2:length(tile.dirs)]
 
-      lapply(tile.dirs[20], function(tile.dir) {
+      lapply(tile.dirs[22], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
