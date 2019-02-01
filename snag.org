@@ -1476,7 +1476,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
   })
 #+end_src
-** add some additional features/layers
+** NEXT add some additional features/layers
 
 #+begin_src R
 
