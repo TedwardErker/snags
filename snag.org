@@ -1,9 +1,10 @@
 #+TITLE:Classify Snags
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
+#+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
@@ -1376,8 +1377,6 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
           library(raster)
       library(stringr)
 
-46.05452,	-89.56842
-45.61730, -90.90989
           d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
           coordinates(d) <- ~long + lat
           proj4string(d) <- CRS("+init=epsg:4326")
