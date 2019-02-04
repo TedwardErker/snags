@@ -1,8 +1,8 @@
 #+TITLE:Classify Snags
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
-#+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
-##+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
@@ -1476,14 +1476,14 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
   })
 #+end_src
-** NEXT add some additional features/layers
+** add some additional features/layers
 
 #+begin_src R
 
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[c(23)], function(tile.dir) {
+    lapply(tile.dirs[6:24], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
