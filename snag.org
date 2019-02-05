@@ -1508,7 +1508,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
     tile.dirs <- tile.dirs[2:length(tile.dirs)]
 
-      lapply(tile.dirs[22], function(tile.dir) {
+      lapply(tile.dirs[5:23], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
@@ -1555,6 +1555,16 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
           })
       })
 #+end_src
+
+#+RESULTS:
+: 
+: Attaching package: ‘tidyr’
+: 
+: The following object is masked from ‘package:raster’:
+: 
+:     extract
+: Error in { : 
+:   task 1 failed - "Cannot create a RasterLayer object from this file. (file does not exist)"
 
 ** Black River training data, Build model, and predict onto cropped images
 
