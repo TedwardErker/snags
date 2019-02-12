@@ -3,8 +3,8 @@
 #+email: erker@wisc.edu
 ##+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
-##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{natbib}
@@ -52,87 +52,6 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
-#+begin_example
-Loading required package: sp
-Loading required package: bit
-Attaching package bit
-package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
-creators: bit bitwhich
-coercion: as.logical as.integer as.bit as.bitwhich which
-operator: ! & | xor != ==
-querying: print length any all min max range sum summary
-bit access: length<- [ [<- [[ [[<-
-for more help type ?bit
-
-Attaching package: ‘bit’
-
-The following object is masked from ‘package:base’:
-
-    xor
-
-Attaching package ff
-- getOption("fftempdir")=="/tmp/RtmpnZ0zLL"
-
-- getOption("ffextension")=="ff"
-
-- getOption("ffdrop")==TRUE
-
-- getOption("fffinonexit")==TRUE
-
-- getOption("ffpagesize")==65536
-
-- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
-
-- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
-
-- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
-
-
-Attaching package: ‘ff’
-
-The following objects are masked from ‘package:bit’:
-
-    clone, clone.default, clone.list
-
-The following objects are masked from ‘package:raster’:
-
-    filename, is.factor, ncol<-, nrow<-
-
-The following objects are masked from ‘package:utils’:
-
-    write.csv, write.csv2
-
-The following objects are masked from ‘package:base’:
-
-    is.factor, is.ordered
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:raster’:
-
-    intersect, select, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-randomForest 4.6-12
-Type rfNews() to see new features/changes/bug fixes.
-
-Attaching package: ‘randomForest’
-
-The following object is masked from ‘package:dplyr’:
-
-    combine
-Loading required package: foreach
-foreach: simple, scalable parallel programming from Revolution Analytics
-Use Revolution R for scalability, fault tolerance and more.
-http://www.revolutionanalytics.com
-Loading required package: iterators
-#+end_example
 
 * bits
 ** texture params
@@ -1369,51 +1288,79 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 ** read points
 
 #+begin_src R
-          library(readxl)
-          library(sp)
-          library(rgeos)
-          library(maptools)
-          library(dplyr)
-          library(raster)
-      library(stringr)
+            library(readxl)
+            library(sp)
+            library(rgeos)
+            library(maptools)
+            library(dplyr)
+            library(raster)
+        library(stringr)
 
-          d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
-          coordinates(d) <- ~long + lat
-          proj4string(d) <- CRS("+init=epsg:4326")
+            d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
+            coordinates(d) <- ~long + lat
+            proj4string(d) <- CRS("+init=epsg:4326")
 
-          utms <- c("15","16")
-          bufs <- lapply(utms, function(utm) {
-              p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
-              buf <- gBuffer(p, width = 2000, byid = T)
-              buf <- gUnion(buf, buf)
-              buf <- disaggregate(buf)
-              buf
-      })
+  shapefile(d, "data/NAIPImages/MYSE_captures_2014.shp")
 
-
-      names(bufs) <- c("utm15","utm16")
-      shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
-      shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
+            utms <- c("15","16")
+            bufs <- lapply(utms, function(utm) {
+                p <- spTransform(d, CRS(paste0("+init=epsg:269",utm)))
+                buf <- gBuffer(p, width = 2000, byid = T)
+                buf <- gUnion(buf, buf)
+                buf <- disaggregate(buf)
+                buf
+        })
 
 
-  p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +y_0=-4480000 +ellps=GRS80 +units=m +no_defs"))
-              buf <- gBuffer(p, width = 2000, byid = T)
-              buf <- gUnion(buf, buf)
-    bufs$wtm <- disaggregate(buf)
+        names(bufs) <- c("utm15","utm16")
+        shapefile(bufs$utm15, "data/NAIPImages/MYSE_captures_2014_utm15.shp", overwrite = T)
+        shapefile(bufs$utm16, "data/NAIPImages/MYSE_captures_2014_utm16.shp", overwrite = T)
 
-                  shapefile(bufs$wtm, "data/NAIPImages/MYSE_captures_2014_wtm.shp", overwrite = T)
+
+    p <- spTransform(d, CRS("+proj=tmerc +lat_0=0 +lon_0=-90 +k=0.9996 +x_0=520000 +y_0=-4480000 +ellps=GRS80 +units=m +no_defs"))
+                buf <- gBuffer(p, width = 2000, byid = T)
+                buf <- gUnion(buf, buf)
+      bufs$wtm <- disaggregate(buf)
+
+                    shapefile(bufs$wtm, "data/NAIPImages/MYSE_captures_2014_wtm.shp", overwrite = T)
 #+end_src
 
 #+RESULTS:
-: rgeos version: 0.3-23, (SVN revision 546)
-:  GEOS runtime version: 3.5.0-CAPI-1.9.0 r4084 
-:  Linking to sp version: 1.2-4 
-:  Polygon checking: TRUE
-: Checking rgeos availability: TRUE
-: There were 13 warnings (use warnings() to see them)
-: There were 15 warnings (use warnings() to see them)
-: Warning message:
-: Setting row names on a tibble is deprecated.
+#+begin_example
+rgeos version: 0.3-26, (SVN revision 560)
+ GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
+ Linking to sp version: 1.2-7 
+ Polygon checking: TRUE
+Checking rgeos availability: TRUE
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:rgeos’:
+
+    intersect, setdiff, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Attaching package: ‘raster’
+
+The following object is masked from ‘package:dplyr’:
+
+    select
+Warning message:
+In rgdal::writeOGR(x, filename, layer, driver = "ESRI Shapefile",  :
+  Field names abbreviated for ESRI Shapefile driver
+Warning messages:
+1: Setting row names on a tibble is deprecated. 
+2: Setting row names on a tibble is deprecated.
+Warning message:
+Setting row names on a tibble is deprecated.
+#+end_example
 ** read images and crop to 2km
 #+begin_src R
 
@@ -1775,12 +1722,12 @@ by an hour, so I'm going to just build one model for flambeau
       imgs <- str_extract(imgs, "m_[0-9]{7}.*/masked_[0-9]+")
 
       cores <- length(imgs)
-    cores <- 3
+    cores <- 2
 
     cl <- makeCluster(cores)
       registerDoParallel(cl)
 
-      features <- foreach (img = imgs[21],
+      features <- foreach (img = imgs[c(21,22)],
                            .packages = c("raster","stringr","randomForest")) %dopar% {
 
                                img.features <- list.files(f.dir, full.names = T, recursive = T)
@@ -1881,10 +1828,10 @@ NHAL is all in the same flightline.
 
   df.sub <- df
 
-  mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
+  #mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
-  saveRDS(mod, paste0(f.dir, "mod.rds"))
-
+  #saveRDS(mod, paste0(f.dir, "mod.rds"))
+  #mod <- readRDS(paste0(f.dir, "mod.rds"))
 
 
   imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
@@ -1892,7 +1839,6 @@ NHAL is all in the same flightline.
 
   cores <- length(imgs)
 
-  cores <- 3
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
