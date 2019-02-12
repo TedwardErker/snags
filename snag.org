@@ -1682,6 +1682,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 The dates are so close together and the time of day is only different
 by an hour, so I'm going to just build one model for flambeau
 #+begin_src R
+#m_4509025_ne_15_1_20130703
     f.dir <- "data/NAIPImages/FlambeauRiverSF2014/"
 
     imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
