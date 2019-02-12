@@ -2,8 +2,8 @@
 #+AUTHOR: Tedward Erker
 #+email: erker@wisc.edu
 ##+PROPERTY: header-args:R :session *R:snag* :cache no :results output :exports results :tangle yes :eval yes
-#+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
-##+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
+##+PROPERTY: header-args:R :session *R:snag:black* :cache no :results output :exports results :tangle yes :eval yes
+#+PROPERTY: header-args:R :session *R:snag:flam* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:nhal* :cache no :results output :exports results :tangle yes :eval yes
 ##+PROPERTY: header-args:R :session *R:snag:sandhill* :cache no :results output :exports results :tangle yes :eval yes
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
@@ -1405,9 +1405,13 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 #+end_src
 
 #+RESULTS:
-: Warning messages:
-: 1: Setting row names on a tibble is deprecated. 
-: 2: Setting row names on a tibble is deprecated.
+: rgeos version: 0.3-23, (SVN revision 546)
+:  GEOS runtime version: 3.5.0-CAPI-1.9.0 r4084 
+:  Linking to sp version: 1.2-4 
+:  Polygon checking: TRUE
+: Checking rgeos availability: TRUE
+: There were 13 warnings (use warnings() to see them)
+: There were 15 warnings (use warnings() to see them)
 : Warning message:
 : Setting row names on a tibble is deprecated.
 ** read images and crop to 2km
