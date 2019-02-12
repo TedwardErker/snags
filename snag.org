@@ -1433,7 +1433,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
   #cropped.images <- lapply(1:length(projs), function(i) {
 
-  cropped.images <- lapply(6:24, function(i) {
+  cropped.images <- lapply(15, function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
@@ -1487,7 +1487,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[6:24], function(tile.dir) {
+    lapply(tile.dirs[15], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
@@ -1505,14 +1505,15 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 #+begin_src R
   library(tidyr)
 
-    cores <- 40
+    cores <- 30
+
 
     tile.dirs <- list.dirs("data/NAIPImages/")
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
     tile.dirs <- tile.dirs[2:length(tile.dirs)]
 
-      lapply(tile.dirs[5:23], function(tile.dir) {
+      lapply(tile.dirs[14], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
@@ -1686,114 +1687,114 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 The dates are so close together and the time of day is only different
 by an hour, so I'm going to just build one model for flambeau
 #+begin_src R
-#m_4509025_ne_15_1_20130703
-    f.dir <- "data/NAIPImages/FlambeauRiverSF2014/"
+  #m_4509025_ne_15_1_20130703
+      f.dir <- "data/NAIPImages/FlambeauRiverSF2014/"
 
-    imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
+      imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
 
-    imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
+      imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
-    lapply(imgs[c(2,3)], function(img) {
+      lapply(imgs[c(2,3)], function(img) {
 
-        train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
+          train.imgs <- list.files(f.dir, paste0(img, "_masked.*.tif$"), full.names = T)
 
-        train.imgs <- lapply(train.imgs, raster)
+          train.imgs <- lapply(train.imgs, raster)
 
-        train.imgs <- lapply(train.imgs, function(r) {
-            cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
-            cells <- which(getValues(r > 0))
-            df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
-        })
+          train.imgs <- lapply(train.imgs, function(r) {
+              cover <- str_extract(names(r), "(livetrees|liveveg|other|snag)")
+              cells <- which(getValues(r > 0))
+              df <- data.frame(cell = cells, Class = cover, stringsAsFactors = F)
+          })
 
-        ext_ID <- do.call("bind", train.imgs)
+          ext_ID <- do.call("bind", train.imgs)
 
-        f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_[0-9]+_.*.tif$")
+          f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_[0-9]+_.*.tif$")
 
-        train.stack <- stack(f)
+          train.stack <- stack(f)
 
-        nl <- 1:nlayers(train.stack)
+          nl <- 1:nlayers(train.stack)
 
-        divide <- 4
+          divide <- 4
 
-        for (i in 1:divide) {
-            fn <- paste0(f.dir,img, "_",i,".ffdata")
+          for (i in 1:divide) {
+              fn <- paste0(f.dir,img, "_",i,".ffdata")
 
-            mat <- ff(vmode="integer",dim=c(ncell(train.stack),length(nl) / divide),filename=fn)
+              mat <- ff(vmode="integer",dim=c(ncell(train.stack),length(nl) / divide),filename=fn)
 
-            for(j in 1:36){
-                mat[,j] <- train.stack[[((i-1)*36 + j)]][]   # need to fix index in mat......  1:36
-            }
+              for(j in 1:36){
+                  mat[,j] <- train.stack[[((i-1)*36 + j)]][]   # need to fix index in mat......  1:36
+              }
 
-            extracted.values <- mat[ext_ID$cell,]
+              extracted.values <- mat[ext_ID$cell,]
 
-            df <- data.frame(extracted.values)
-            colnames(df) <- names(train.stack)[((i-1)*36 + 1:36)]
+              df <- data.frame(extracted.values)
+              colnames(df) <- names(train.stack)[((i-1)*36 + 1:36)]
 
-            df$Class <- factor(ext_ID$Class)
+              df$Class <- factor(ext_ID$Class)
 
-            saveRDS(df,file=paste0(f.dir,img, "_",i,"_train.rds"))
-        }
+              saveRDS(df,file=paste0(f.dir,img, "_",i,"_train.rds"))
+          }
 
-        df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.rds"), full.names = T)
-        df.s <- lapply(df.s, readRDS)
-        df <- do.call("cbind", df.s)
+          df.s <- list.files(f.dir, pattern = paste0(".*",img, "_[0-9]_train.rds"), full.names = T)
+          df.s <- lapply(df.s, readRDS)
+          df <- do.call("cbind", df.s)
 
-        saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
+          saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
 
-    })
+      })
 
-    dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.rds"), full.names = T, recursive = T)
+      dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.rds"), full.names = T, recursive = T)
 
-    dfs <- lapply(dfs, readRDS)
-
-
-                                            # drop the duplicate "Class" columns
-    dfs <- lapply(dfs, function(x) x[,-c(37,74,111)])
-
-    for(i in 1:length(dfs)) {
-        colnames(dfs[[i]])[1:(length(colnames(dfs[[i]]))-1)] <- str_match(colnames(dfs[[i]]), "^(masked_[0-9]+_)(.*)")[,3][1:(length(colnames(dfs[[i]]))-1)]
-    }
+      dfs <- lapply(dfs, readRDS)
 
 
-    df <- do.call("rbind", dfs)
+                                              # drop the duplicate "Class" columns
+      dfs <- lapply(dfs, function(x) x[,-c(37,74,111)])
 
-    df <- df %>% na.omit()
-
-    df.s <- filter(df, Class == "snag")
-    df.allelse <- filter(df, Class != "snag")
-    df.sub <- sample_n(df.allelse, 350000)
-    df.sub <- rbind(df.s, df.sub)
-
-    mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
+      for(i in 1:length(dfs)) {
+          colnames(dfs[[i]])[1:(length(colnames(dfs[[i]]))-1)] <- str_match(colnames(dfs[[i]]), "^(masked_[0-9]+_)(.*)")[,3][1:(length(colnames(dfs[[i]]))-1)]
+      }
 
 
-  #  saveRDS(mod, paste0(f.dir, "mod.rds"))
+      df <- do.call("rbind", dfs)
+
+      df <- df %>% na.omit()
+
+      df.s <- filter(df, Class == "snag")
+      df.allelse <- filter(df, Class != "snag")
+      df.sub <- sample_n(df.allelse, 350000)
+      df.sub <- rbind(df.s, df.sub)
+
+      mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
 
-    imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
-    imgs <- str_extract(imgs, "m_[0-9]{7}.*/masked_[0-9]+")
+    #  saveRDS(mod, paste0(f.dir, "mod.rds"))
 
-    cores <- length(imgs)
-  cores <- 3
 
-  cl <- makeCluster(cores)
-    registerDoParallel(cl)
+      imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
+      imgs <- str_extract(imgs, "m_[0-9]{7}.*/masked_[0-9]+")
 
-    features <- foreach (img = imgs,
-                         .packages = c("raster","stringr","randomForest")) %dopar% {
+      cores <- length(imgs)
+    cores <- 3
 
-                             img.features <- list.files(f.dir, full.names = T, recursive = T)
-                             img.features <- str_extract(img.features, paste0(".*",img,"_.*")) %>% na.omit  #potential problem if existig predicted tiles are in the directory
+    cl <- makeCluster(cores)
+      registerDoParallel(cl)
 
-                           st <- stack(img.features)
-                                            #                         to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
+      features <- foreach (img = imgs[21],
+                           .packages = c("raster","stringr","randomForest")) %dopar% {
 
-                             names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
+                               img.features <- list.files(f.dir, full.names = T, recursive = T)
+                               img.features <- str_extract(img.features, paste0(".*",img,"_.*")) %>% na.omit  #potential problem if existig predicted tiles are in the directory
 
-                             pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
-                             pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
+                             st <- stack(img.features)
+                                              #                         to_replace <- str_extract(names(mod$forest$ncat)[1], "masked_[0-9]_")
 
-                         }
+                               names(st) <- str_replace(names(st), "masked_[0-9]+_", "")
+
+                               pred.filename <- paste0(f.dir,str_replace(img, "/", "_"), "_predicted.tif")
+                               pred.r <- raster::predict(st, mod, filename = pred.filename,  overwrite = T, datatype = "INT1U")
+
+                           }
 #+end_src
 
 ** NHAL
