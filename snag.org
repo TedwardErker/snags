@@ -1329,32 +1329,14 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
 #+RESULTS:
 #+begin_example
-rgeos version: 0.3-26, (SVN revision 560)
- GEOS runtime version: 3.6.2-CAPI-1.10.2 4d2925d6 
- Linking to sp version: 1.2-7 
+rgeos version: 0.3-23, (SVN revision 546)
+ GEOS runtime version: 3.5.0-CAPI-1.9.0 r4084 
+ Linking to sp version: 1.2-4 
  Polygon checking: TRUE
 Checking rgeos availability: TRUE
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:rgeos’:
-
-    intersect, setdiff, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Attaching package: ‘raster’
-
-The following object is masked from ‘package:dplyr’:
-
-    select
-Warning message:
+Error in rgdal::writeOGR(x, filename, layer, driver = "ESRI Shapefile",  : 
+  STRING_ELT() can only be applied to a 'character vector', not a 'list'
+In addition: Warning message:
 In rgdal::writeOGR(x, filename, layer, driver = "ESRI Shapefile",  :
   Field names abbreviated for ESRI Shapefile driver
 Warning messages:
@@ -1382,7 +1364,7 @@ Setting row names on a tibble is deprecated.
 
   #cropped.images <- lapply(1:length(projs), function(i) {
 
-  cropped.images <- lapply(15, function(i) {
+  cropped.images <- lapply(c(19,21), function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
