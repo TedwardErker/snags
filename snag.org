@@ -1418,7 +1418,7 @@ Setting row names on a tibble is deprecated.
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[15], function(tile.dir) {
+    lapply(tile.dirs[18:26], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
@@ -1442,9 +1442,8 @@ Setting row names on a tibble is deprecated.
     tile.dirs <- list.dirs("data/NAIPImages/")
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    tile.dirs <- tile.dirs[2:length(tile.dirs)]
 
-      lapply(tile.dirs[14], function(tile.dir) {
+      lapply(tile.dirs[18:26], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
