@@ -1814,7 +1814,7 @@ NHAL is all in the same flightline.
   #mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
 
   #saveRDS(mod, paste0(f.dir, "mod.rds"))
-  #mod <- readRDS(paste0(f.dir, "mod.rds"))
+  mod <- readRDS(paste0(f.dir, "mod.rds"))
 
 
   imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
