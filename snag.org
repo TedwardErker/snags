@@ -1732,7 +1732,6 @@ NHAL is all in the same flightline.
 #+begin_src R
   f.dir <- "data/NAIPImages/NHAL2013/"
 
-
   imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
