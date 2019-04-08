@@ -1410,7 +1410,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[18:26], function(tile.dir) {
+    lapply(tile.dirs[18:25], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
@@ -1435,7 +1435,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
 
-      lapply(tile.dirs[18:26], function(tile.dir) {
+      lapply(tile.dirs[18:25], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
