@@ -1429,8 +1429,6 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   library(tidyr)
 
     cores <- 30
-
-
     tile.dirs <- list.dirs("data/NAIPImages/")
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
@@ -1482,6 +1480,16 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
           })
       })
 #+end_src
+
+#+RESULTS:
+: 
+: Attaching package: ‘tidyr’
+: 
+: The following object is masked from ‘package:raster’:
+: 
+:     extract
+: Error in remove.tif.ext(list.files(tile.dir, paste0(tile.name, focal.feature.pattern))) : 
+:   could not find function "remove.tif.ext"
 
 ** Black River training data, Build model, and predict onto cropped images
 
