@@ -1831,13 +1831,13 @@ NHAL is all in the same flightline.
 #+begin_src R
   f.dir <- "data/NAIPImages/NHAL2013/"
 
-  imgs.wTraining <- list.files(f.dir, "m_[0-9]{7}_.*_masked.*(livetrees|liveveg|other|snag).*tif$") %>% na.omit()
+  imgs.wTraining <- list.files(f.dir, "m_4508903_ne_16_1_20130905_masked_10int_(livetrees|liveveg|other|snag)_4.tif$") %>% na.omit()
 
   imgs <- str_extract(imgs.wTraining, "m_[0-9]{7}_.*_[0-9]{8}") %>% na.omit() %>% unique()
 
   lapply(imgs, function(img) {
 
-      train.imgs <- list.files(f.dir, paste0(img, "_masked.*(livetrees|liveveg|other|snag).*.tif$"), full.names = T)
+      train.imgs <- list.files(f.dir, paste0(img, "_masked.*(other|snag)_4.*.tif$"), full.names = T)
 
       train.imgs <- lapply(train.imgs, raster)
 
