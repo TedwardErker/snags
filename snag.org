@@ -1356,7 +1356,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
   #cropped.images <- lapply(1:length(projs), function(i) {
 
-  cropped.images <- lapply(c(19,21), function(i) {
+  cropped.images <- lapply(c(19,25), function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
