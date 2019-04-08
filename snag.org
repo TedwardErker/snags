@@ -1327,6 +1327,16 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   ## shapefile(bufs$wtm, "data/NAIPImages/MYSE_captures_2014_wtm.shp", overwrite = T)
 #+end_src
 
+#+RESULTS:
+: Error in rgdal::writeOGR(x, filename, layer, driver = "ESRI Shapefile",  : 
+:   STRING_ELT() can only be applied to a 'character vector', not a 'list'
+: In addition: Warning message:
+: In rgdal::writeOGR(x, filename, layer, driver = "ESRI Shapefile",  :
+:   Field names abbreviated for ESRI Shapefile driver
+: Warning messages:
+: 1: Setting row names on a tibble is deprecated. 
+: 2: Setting row names on a tibble is deprecated.
+
 ** read images and crop to 2km
 #+begin_src R
 
@@ -1829,6 +1839,10 @@ NHAL is all in the same flightline.
 ** NHAL  redo/update [2019-04-08 Mon]
 NHAL is all in the same flightline.
 #+begin_src R
+  library(ff)
+  library(randomForest)
+  library(doParallel)
+
   f.dir <- "data/NAIPImages/NHAL2013/"
 
   imgs.wTraining <- list.files(f.dir, "m_4508903_ne_16_1_20130905_masked_10int_(livetrees|liveveg|other|snag)_4.tif$") %>% na.omit()
@@ -1849,7 +1863,7 @@ NHAL is all in the same flightline.
 
       ext_ID <- do.call("bind", train.imgs)
 
-      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_11_.*.tif$")  # I changed this to 11 for 60_nw;  I changed the number to 12 because there iis also an "11" for this tile
+      f <- list.files(paste0(f.dir, img), full.names = T, pattern = "masked_10_.*.tif$")  # I changed this to 11 for 60_nw;  I changed the number to 12 because there iis also an "11" for this tile
 
       train.stack <- stack(f)
 
@@ -1882,12 +1896,11 @@ NHAL is all in the same flightline.
       df.s <- lapply(df.s, readRDS)
       df <- do.call("cbind", df.s)
 
-      saveRDS(df, paste0(f.dir,img, "_model_building_df.rds"))
+      saveRDS(df, paste0(f.dir,img, "_model_building_df_extension_201904.rds"))
 
   })
 
-
-  dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.rds"), full.names = T, recursive = T)
+  dfs <- list.files(f.dir, pattern = paste0(".*","_model_building_df.*.rds"), full.names = T, recursive = T)
 
   dfs <- lapply(dfs, readRDS)
 
@@ -1909,10 +1922,9 @@ NHAL is all in the same flightline.
 
   df.sub <- df
 
-  #mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
-
-  #saveRDS(mod, paste0(f.dir, "mod.rds"))
-  mod <- readRDS(paste0(f.dir, "mod.rds"))
+  mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
+  saveRDS(mod, paste0(f.dir, "mod_201904.rds"))
+  mod <- readRDS(paste0(f.dir, "mod_201904.rds"))
 
 
   imgs <- list.files(f.dir, pattern = "masked_[0-9]+.tif$", full.names = T, recursive = T)
