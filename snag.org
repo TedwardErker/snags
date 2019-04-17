@@ -1298,11 +1298,11 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   library(raster)
   library(stringr)
 
-  d <- read_excel("data/NAIPImages/MYSE_captures_2014.xlsx")
+  d <- read_excel("data/NAIPImages/MYSE_captures_2014_new.xlsx")
   coordinates(d) <- ~long + lat
   proj4string(d) <- CRS("+init=epsg:4326")
 
-  shapefile(d, "data/NAIPImages/MYSE_captures_2014.shp", overwrite = T)
+  shapefile(d, "data/NAIPImages/MYSE_captures_2014_new.shp", overwrite = T)
 
   utms <- c("15","16")
   bufs <- lapply(utms, function(utm) {
