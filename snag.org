@@ -54,6 +54,69 @@ library(randomForest)
 #+end_src
 
 #+RESULTS:
+#+begin_example
+Loading required package: bit
+Attaching package bit
+package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
+creators: bit bitwhich
+coercion: as.logical as.integer as.bit as.bitwhich which
+operator: ! & | xor != ==
+querying: print length any all min max range sum summary
+bit access: length<- [ [<- [[ [[<-
+for more help type ?bit
+
+Attaching package: ‘bit’
+
+The following object is masked from ‘package:base’:
+
+    xor
+
+Attaching package ff
+- getOption("fftempdir")=="/tmp/RtmpxZdblF"
+
+- getOption("ffextension")=="ff"
+
+- getOption("ffdrop")==TRUE
+
+- getOption("fffinonexit")==TRUE
+
+- getOption("ffpagesize")==65536
+
+- getOption("ffcaching")=="mmnoflush"  -- consider "ffeachflush" if your system stalls on large writes
+
+- getOption("ffbatchbytes")==16777216 -- consider a different value for tuning your system
+
+- getOption("ffmaxbytes")==536870912 -- consider a different value for tuning your system
+
+
+Attaching package: ‘ff’
+
+The following objects are masked from ‘package:bit’:
+
+    clone, clone.default, clone.list
+
+The following objects are masked from ‘package:raster’:
+
+    filename, is.factor, ncol<-, nrow<-
+
+The following objects are masked from ‘package:utils’:
+
+    write.csv, write.csv2
+
+The following objects are masked from ‘package:base’:
+
+    is.factor, is.ordered
+randomForest 4.6-12
+Type rfNews() to see new features/changes/bug fixes.
+
+Attaching package: ‘randomForest’
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+Loading required package: foreach
+Loading required package: iterators
+#+end_example
 
 * bits
 ** texture params
@@ -1410,7 +1473,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[18:25], function(tile.dir) {
+    lapply(tile.dirs[c(13,15,23,24,26, 31)], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
@@ -1424,6 +1487,44 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   })
 #+end_src
 
+#+RESULTS:
+#+begin_example
+[[1]]
+[[1]][[1]]
+NULL
+
+
+[[2]]
+[[2]][[1]]
+NULL
+
+[[2]][[2]]
+NULL
+
+[[2]][[3]]
+NULL
+
+
+[[3]]
+[[3]][[1]]
+NULL
+
+
+[[4]]
+[[4]][[1]]
+NULL
+
+
+[[5]]
+[[5]][[1]]
+NULL
+
+
+[[6]]
+[[6]][[1]]
+NULL
+#+end_example
+
 
 #+begin_src R
   library(tidyr)
@@ -1433,7 +1534,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
 
-      lapply(tile.dirs[18:25], function(tile.dir) {
+      lapply(tile.dirs[c(13,15,23,24,26, 31)], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
@@ -1482,14 +1583,42 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 #+end_src
 
 #+RESULTS:
-: 
-: Attaching package: ‘tidyr’
-: 
-: The following object is masked from ‘package:raster’:
-: 
-:     extract
-: Error in remove.tif.ext(list.files(tile.dir, paste0(tile.name, focal.feature.pattern))) : 
-:   could not find function "remove.tif.ext"
+#+begin_example
+[[1]]
+[[1]][[1]]
+NULL
+
+
+[[2]]
+[[2]][[1]]
+NULL
+
+[[2]][[2]]
+NULL
+
+[[2]][[3]]
+NULL
+
+
+[[3]]
+[[3]][[1]]
+NULL
+
+
+[[4]]
+[[4]][[1]]
+NULL
+
+
+[[5]]
+[[5]][[1]]
+NULL
+
+
+[[6]]
+[[6]][[1]]
+NULL
+#+end_example
 
 ** Black River training data, Build model, and predict onto cropped images
 
