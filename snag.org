@@ -2060,8 +2060,8 @@ NHAL is all in the same flightline.
 
   df.sub <- df
 
-  mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
-  saveRDS(mod, paste0(f.dir, "mod_201904.rds"))
+  #mod <- randomForest(y = factor(df.sub$Class), x= df.sub[,1:(dim(df.sub)[2]-1)])
+  #saveRDS(mod, paste0(f.dir, "mod_201904.rds"))
   mod <- readRDS(paste0(f.dir, "mod_201904.rds"))
 
 
@@ -2073,7 +2073,7 @@ NHAL is all in the same flightline.
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
-  features <- foreach (img = imgs,
+  features <- foreach (img = imgs[c(21,12,9,8)],
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
                            img.features <- list.files(f.dir, full.names = T, recursive = T)
