@@ -1419,7 +1419,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
 
   #cropped.images <- lapply(1:length(projs), function(i) {
 
-  cropped.images <- lapply(c(14), function(i) {
+  cropped.images <- lapply(c(16), function(i) {
 
       if(grepl(".*zone=15.*", projs[i])) {
           ci <- lapply(1:length(bufs$utm15), function(j) {
@@ -1473,7 +1473,7 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   tile.dirs <- list.dirs("data/NAIPImages/")
   tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
-    lapply(tile.dirs[c(14)], function(tile.dir) {
+    lapply(tile.dirs[c(7,16)], function(tile.dir) {
         tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
       lapply(tile.names, function(tile.name) {
 
@@ -1487,44 +1487,6 @@ writeRaster(pred.test, "data/image/test/prediction.tif", overwrite = T, dataType
   })
 #+end_src
 
-#+RESULTS:
-#+begin_example
-[[1]]
-[[1]][[1]]
-NULL
-
-
-[[2]]
-[[2]][[1]]
-NULL
-
-[[2]][[2]]
-NULL
-
-[[2]][[3]]
-NULL
-
-
-[[3]]
-[[3]][[1]]
-NULL
-
-
-[[4]]
-[[4]][[1]]
-NULL
-
-
-[[5]]
-[[5]][[1]]
-NULL
-
-
-[[6]]
-[[6]][[1]]
-NULL
-#+end_example
-
 
 #+begin_src R
   library(tidyr)
@@ -1534,7 +1496,7 @@ NULL
     tile.dirs <- tile.dirs[grepl(".*[0-9]{8}[_w]*", tile.dirs)]
 
 
-      lapply(tile.dirs[c(14)], function(tile.dir) {
+      lapply(tile.dirs[c(7,16)], function(tile.dir) {
           tile.names <- tools::file_path_sans_ext(list.files(tile.dir, pattern = ".*masked_[0-9]+.tif$"))
 
           lapply(tile.names, function(tile.name) {
