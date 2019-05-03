@@ -1807,7 +1807,7 @@ by an hour, so I'm going to just build one model for flambeau
     cl <- makeCluster(cores)
       registerDoParallel(cl)
 
-      features <- foreach (img = imgs[c(17,20,21,22)],
+      features <- foreach (img = imgs[c(17)],
                            .packages = c("raster","stringr","randomForest")) %dopar% {
 
                                img.features <- list.files(f.dir, full.names = T, recursive = T)
