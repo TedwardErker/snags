@@ -1883,7 +1883,7 @@ NHAL is all in the same flightline.
   cl <- makeCluster(cores)
   registerDoParallel(cl)
 
-  features <- foreach (img = imgs,
+  features <- foreach (img = imgs[c(5,6,10,11,12)],
                        .packages = c("raster","stringr","randomForest")) %dopar% {
 
                            img.features <- list.files(f.dir, full.names = T, recursive = T)
